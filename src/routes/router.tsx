@@ -23,5 +23,5 @@ export const router = createBrowserRouter([
     ],
   },
 ], {
-  basename: '/corefoundry-frontend'
+  basename: import.meta.env.PROD ? '/corefoundry-frontend' : '/'
 })
