@@ -40,10 +40,17 @@ jobs:
         run: |
           echo "=== Listing dist/ contents ==="
           ls -la dist/
-          echo "=== Checking dist/index.html size ==="
-          wc -c dist/index.html
-          echo "=== First 20 lines of dist/index.html ==="
-          head -20 dist/index.html
+          if [ -f dist/index.html ]; then
+            echo "=== Checking dist/index.html size ==="
+            wc -c dist/index.html
+            echo "=== First 30 lines of dist/index.html ==="
+            head -30 dist/index.html
+            echo "=== Checking for JS files ==="
+            find dist -name "*.js" -type f
+          else
+            echo "ERROR: dist/index.html not found!"
+            exit 1
+          fi
 
       - name: Setup Pages
         uses: actions/configure-pages@v4
