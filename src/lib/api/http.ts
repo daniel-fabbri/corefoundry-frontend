@@ -4,7 +4,7 @@ const BASE_URL = import.meta.env.VITE_COREFOUNDRY_API_URL || 'http://localhost:8
 
 export const http = axios.create({
   baseURL: BASE_URL,
-  timeout: 180000,
+  timeout: 180000, 
   headers: {
     'Content-Type': 'application/json',
     'ngrok-skip-browser-warning': 'true',
