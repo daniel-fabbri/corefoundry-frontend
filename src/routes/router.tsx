@@ -6,11 +6,13 @@ import { AgentDetailPage } from '@/pages/AgentDetailPage'
 import { ChatPage } from '@/pages/ChatPage'
 import { KnowledgePage } from '@/pages/KnowledgePage'
 import { SettingsPage } from '@/pages/SettingsPage'
+import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 
 export const router = createBrowserRouter([
   {
     path: '/',
     element: <AppShell />,
+    errorElement: <ErrorBoundary />,
     children: [
       { index: true, element: <DashboardPage /> },
       { path: 'agents', element: <AgentsPage /> },
@@ -20,4 +22,6 @@ export const router = createBrowserRouter([
       { path: 'settings', element: <SettingsPage /> },
     ],
   },
-])
+], {
+  basename: '/corefoundry-frontend'
+})
