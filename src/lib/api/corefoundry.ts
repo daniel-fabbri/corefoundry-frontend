@@ -39,7 +39,7 @@ export const deleteAgent = async (agentId: string): Promise<void> => {
   await http.delete(`/agents/${agentId}`)
 }
 
-export const chatWithAgent = async (agentId: string, payload: ChatRequest): Promise<ChatResponse> => {
+export const chatWithAgent = async (agentId: number, payload: ChatRequest): Promise<ChatResponse> => {
   const { data } = await http.post<ChatResponse>(`/agents/${agentId}/chat`, payload)
   return data
 }

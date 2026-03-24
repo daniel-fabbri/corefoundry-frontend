@@ -12,15 +12,18 @@ export interface AgentConfig {
 }
 
 export interface Agent {
-  agent_id: string
+  id: number
   name: string
+  description?: string
+  model_name: string
   config: AgentConfig
-  created_at?: string
-  updated_at?: string
+  created_at: string
 }
 
 export interface CreateAgentRequest {
   name: string
+  description?: string
+  model_name?: string
   config: AgentConfig
 }
 
@@ -31,13 +34,19 @@ export interface ChatMessage {
 }
 
 export interface ChatRequest {
-  message: string
+  input: string
   use_knowledge?: boolean
 }
 
 export interface ChatResponse {
   response: string
-  agent_id: string
+  metadata: {
+    model?: string
+    agent_id?: number
+    agent_name?: string
+    error?: boolean
+    [key: string]: unknown
+  }
 }
 
 // Knowledge

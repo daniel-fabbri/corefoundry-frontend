@@ -7,17 +7,43 @@ export const http = axios.create({
   timeout: 30000,
   headers: {
     'Content-Type': 'application/json',
+    'ngrok-skip-browser-warning': 'true',
   },
 })
 
 http.interceptors.request.use(
-  (config) => config,
+  (config) => {
+    console.log('🚀 API Request:', {
+      method: config.method?.toUpperCase(),
+      url: `${config.baseURL}${config.url}`,
+      data: config.data,
+      dataStringified: JSON.stringify(config.data),
+      headers: Object.fromEntries(
+        Object.entries(config.headers || {}).filter(([_, v]) => v !== undefined)
+      )
+    })
+    return config
+  },
   (error) => Promise.reject(error)
 )
 
 http.interceptors.response.use(
-  (response) => response,
+  (response) => {
+    console.log('✅ API Response:', {
+      status: response.status,
+      url: response.config.url,
+      data: response.data
+    })
+    return response
+  },
   (error) => {
+    console.error('❌ API Error:', {
+      url: error.config?.url,
+      status: error.response?.status,
+      statusText: error.response?.statusText,
+      data: error.response?.data,
+      message: error.message
+    })
     const message =
       error.response?.data?.detail ||
       error.response?.data?.message ||

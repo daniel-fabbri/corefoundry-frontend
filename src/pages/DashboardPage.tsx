@@ -42,7 +42,7 @@ export function DashboardPage() {
             <Bot className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent>
-            {agents.isLoading ? <Skeleton className="h-8 w-12" /> : agents.isError ? <span className="text-2xl font-bold text-destructive">—</span> : <span className="text-2xl font-bold">{agents.data?.length ?? 0}</span>}
+            {agents.isLoading ? <Skeleton className="h-8 w-12" /> : agents.isError ? <span className="text-2xl font-bold text-destructive">—</span> : <span className="text-2xl font-bold">{Array.isArray(agents.data) ? agents.data.length : 0}</span>}
           </CardContent>
         </Card>
 
@@ -65,18 +65,18 @@ export function DashboardPage() {
             <div className="space-y-2">{[1,2,3].map(i => <Skeleton key={i} className="h-12 w-full" />)}</div>
           ) : agents.isError ? (
             <ErrorState message="Failed to load agents. Check your API connection." />
-          ) : agents.data?.length === 0 ? (
+          ) : !agents.data || !Array.isArray(agents.data) || agents.data.length === 0 ? (
             <p className="text-sm text-muted-foreground">No agents yet. <Link to="/agents" className="text-primary underline">Create one</Link>.</p>
           ) : (
             <div className="space-y-2">
-              {agents.data?.slice(0, 5).map(agent => (
-                <Link key={agent.agent_id} to={`/agents/${agent.agent_id}`}>
+              {agents.data.slice(0, 5).map(agent => (
+                <Link key={agent.id} to={`/agents/${agent.id}`}>
                   <div className="flex items-center justify-between p-3 rounded-md border border-border hover:bg-accent transition-colors">
                     <div className="flex items-center gap-3">
                       <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center"><Bot className="h-4 w-4 text-primary" /></div>
                       <div>
                         <p className="text-sm font-medium">{agent.name}</p>
-                        <p className="text-xs text-muted-foreground font-mono">{agent.agent_id}</p>
+                        <p className="text-xs text-muted-foreground font-mono">ID: {agent.id}</p>
                       </div>
                     </div>
                     <Badge variant="outline">View</Badge>

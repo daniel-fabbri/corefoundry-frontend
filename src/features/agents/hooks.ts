@@ -33,7 +33,7 @@ export function useDeleteAgent() {
 
 export function useChatWithAgent() {
   return useMutation({
-    mutationFn: ({ agentId, payload }: { agentId: string; payload: ChatRequest }) => chatWithAgent(agentId, payload),
+    mutationFn: ({ agentId, payload }: { agentId: number; payload: ChatRequest }) => chatWithAgent(agentId, payload),
     onError: (err: Error) => { toast.error(err.message || 'Failed to send message') },
   })
 }

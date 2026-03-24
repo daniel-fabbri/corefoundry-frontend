@@ -27,7 +27,7 @@ export function AgentDetailPage() {
     <div className="space-y-6">
       <div className="flex items-center gap-4">
         <Button variant="ghost" size="icon" onClick={() => navigate('/agents')}><ArrowLeft className="h-4 w-4" /></Button>
-        <div><h1 className="text-3xl font-bold">{agent.name}</h1><p className="text-muted-foreground font-mono text-sm">{agent.agent_id}</p></div>
+        <div><h1 className="text-3xl font-bold">{agent.name}</h1><p className="text-muted-foreground font-mono text-sm">ID: {agent.id}</p></div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -35,7 +35,9 @@ export function AgentDetailPage() {
           <CardHeader><CardTitle className="flex items-center gap-2"><Bot className="h-5 w-5" />Agent Info</CardTitle></CardHeader>
           <CardContent className="space-y-3">
             <div><p className="text-xs text-muted-foreground">Name</p><p className="font-medium">{agent.name}</p></div>
-            <div><p className="text-xs text-muted-foreground">ID</p><p className="font-mono text-sm">{agent.agent_id}</p></div>
+            <div><p className="text-xs text-muted-foreground">ID</p><p className="font-mono text-sm">{agent.id}</p></div>
+            <div><p className="text-xs text-muted-foreground">Model</p><p className="text-sm">{agent.model_name}</p></div>
+            {agent.description && <div><p className="text-xs text-muted-foreground">Description</p><p className="text-sm">{agent.description}</p></div>}
             {agent.created_at && <div><p className="text-xs text-muted-foreground">Created</p><p className="text-sm">{new Date(agent.created_at).toLocaleString()}</p></div>}
           </CardContent>
         </Card>
@@ -48,7 +50,7 @@ export function AgentDetailPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Link to={`/chat?agent=${agent.agent_id}`} className="inline-flex items-center gap-2 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors">
+        <Link to={`/chat?agent=${agent.id}`} className="inline-flex items-center gap-2 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors">
             <MessageSquare className="h-4 w-4" />Chat with Agent
           </Link>
         <Button variant="destructive" onClick={() => setDeleteOpen(true)}><Trash2 className="h-4 w-4" />Delete Agent</Button>
