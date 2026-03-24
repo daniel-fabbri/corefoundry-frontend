@@ -4,7 +4,6 @@ import { Link } from 'react-router-dom'
 import { getHealth, getAgents } from '@/lib/api/corefoundry'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Badge } from '@/components/ui/badge'
-import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ErrorState } from '@/components/common/ErrorState'
 import { BASE_URL } from '@/lib/api/http'
@@ -52,8 +51,12 @@ export function DashboardPage() {
             <Clock className="h-4 w-4 text-muted-foreground" />
           </CardHeader>
           <CardContent className="flex flex-col gap-2">
-            <Button asChild size="sm" variant="outline"><Link to="/agents">Manage Agents</Link></Button>
-            <Button asChild size="sm" variant="outline"><Link to="/chat">Open Chat</Link></Button>
+            <Link to="/agents" className="h-9 rounded-md px-3 inline-flex items-center justify-center gap-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors">
+              Manage Agents
+            </Link>
+            <Link to="/chat" className="h-9 rounded-md px-3 inline-flex items-center justify-center gap-2 text-sm font-medium border border-input bg-background hover:bg-accent hover:text-accent-foreground transition-colors">
+              Open Chat
+            </Link>
           </CardContent>
         </Card>
       </div>
