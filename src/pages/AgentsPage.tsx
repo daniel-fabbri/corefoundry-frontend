@@ -1,15 +1,5 @@
 import { useState } from 'react'
 import { Bot, Plus, Trash2, Eye } from 'lucide-react'
-import { Link } from 'react-router-dom'
-import { useForm } from 'react-hook-form'
-import { zodResolver } from '@hookform/resolvers/zod'
-import { z } from 'zod'
-import { useAgents, useCreateAgent, useDeleteAgent } from '@/features/agents/hooks'
-import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
-import { Button } from '@/components/ui/button'
-import { Input } from '@/components/ui/input'
-import { Label } from '@/components/ui/label'
-import { Badge } from '@/components/ui/badge'
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from '@/components/ui/dialog'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { EmptyState } from '@/components/common/EmptyState'
@@ -61,7 +51,9 @@ export function AgentsPage() {
                     <div><p className="font-medium">{agent.name}</p><p className="text-xs text-muted-foreground font-mono">{agent.agent_id}</p></div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Button asChild variant="outline" size="sm"><Link to={`/agents/${agent.agent_id}`}><Eye className="h-4 w-4" />View</Link></Button>
+                    <Link to={`/agents/${agent.agent_id}`} className="inline-flex items-center gap-2 h-9 px-3 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors">
+                        <Eye className="h-4 w-4" />View
+                      </Link>
                     <Button variant="destructive" size="sm" onClick={() => setDeleteId(agent.agent_id)}><Trash2 className="h-4 w-4" /></Button>
                   </div>
                 </div>

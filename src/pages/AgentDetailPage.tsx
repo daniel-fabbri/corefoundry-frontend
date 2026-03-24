@@ -48,7 +48,9 @@ export function AgentDetailPage() {
       </div>
 
       <div className="flex items-center gap-3">
-        <Button asChild><Link to={`/chat?agent=${agent.agent_id}`}><MessageSquare className="h-4 w-4" />Chat with Agent</Link></Button>
+        <Link to={`/chat?agent=${agent.agent_id}`} className="inline-flex items-center gap-2 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors">
+            <MessageSquare className="h-4 w-4" />Chat with Agent
+          </Link>
         <Button variant="destructive" onClick={() => setDeleteOpen(true)}><Trash2 className="h-4 w-4" />Delete Agent</Button>
       </div>
 
