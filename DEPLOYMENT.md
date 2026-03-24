@@ -1,5 +1,5 @@
 # CoreFoundry Frontend
-
+ 
 Frontend application for CoreFoundry - AI Agent Management Platform.
 
 ## Deployment to GitHub Pages
