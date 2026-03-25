@@ -20,7 +20,7 @@ export function ChatPage() {
   const [useKnowledge, setUseKnowledge] = useState(false)
   const chatMutation = useChatWithAgent()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { data: historyData } = useAgentHistory(selectedAgentId?.toString() || null)
+  const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory } = useAgentHistory(selectedAgentId?.toString() || null)
 
   useEffect(() => {
     const agentParam = searchParams.get('agent')
@@ -35,19 +35,28 @@ export function ChatPage() {
 
   // Load conversation history when agent is selected
   useEffect(() => {
-    if (historyData && historyData.length > 0) {
-      const loadedMessages = historyData.map(msg => ({
-        role: msg.role as 'user' | 'assistant',
-        content: msg.content
-      }))
-      setMessages(loadedMessages)
-      console.log('📜 Loaded chat history:', loadedMessages.length, 'messages')
-    } else if (selectedAgentId && historyData) {
-      // Agent selected but no history - clear messages
-      setMessages([])
-      console.log('📜 No chat history for agent', selectedAgentId)
+    console.log('📊 History state:', {
+      selectedAgentId,
+      hasHistoryData: !!historyData,
+      historyLength: historyData?.length || 0,
+      isLoading: isLoadingHistory
+    })
+
+    if (selectedAgentId && historyData !== undefined) {
+      if (historyData && historyData.length > 0) {
+        const loadedMessages = historyData.map(msg => ({
+          role: msg.role as 'user' | 'assistant',
+          content: msg.content
+        }))
+        setMessages(loadedMessages)
+        console.log('📜 Loaded chat history:', loadedMessages.length, 'messages')
+      } else {
+        // Agent selected but no history - clear messages
+        setMessages([])
+        console.log('📜 No chat history for agent', selectedAgentId)
+      }
     }
-  }, [historyData, selectedAgentId])
+  }, [historyData, selectedAgentId, isLoadingHistory])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
@@ -146,7 +155,9 @@ export function ChatPage() {
                 onValueChange={(v) => {
                   const agentId = parseInt(v, 10)
                   setSelectedAgentId(agentId)
+                  setMessages([]) // Clear messages when switching agents
                   console.log('🤖 Agent selected:', agentId, agents?.find(a => a.id === agentId))
+                  console.log('🔄 History will be loaded for agent:', agentId)
                 }}
               >
                 <SelectTrigger id="agent-select">
@@ -187,6 +198,21 @@ export function ChatPage() {
                 onCheckedChange={setUseKnowledge}
               />
             </div>
+
+            {selectedAgentId && (
+              <Button 
+                variant="outline" 
+                size="sm" 
+                className="w-full"
+                onClick={() => {
+                  console.log('🔄 Manually reloading history for agent:', selectedAgentId)
+                  refetchHistory()
+                }}
+                disabled={isLoadingHistory}
+              >
+                {isLoadingHistory ? 'Loading...' : 'Reload History'}
+              </Button>
+            )}
 
             {messages.length > 0 && (
               <Button 
