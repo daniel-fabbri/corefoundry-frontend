@@ -22,4 +22,6 @@ export const router = createBrowserRouter([
       { path: 'settings', element: <SettingsPage /> },
     ],
   },
-])
+], {
+  basename: '/corefoundry-frontend'
+})
