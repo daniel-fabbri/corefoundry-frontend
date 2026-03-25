@@ -20,7 +20,19 @@ export function ChatPage() {
   const [useKnowledge, setUseKnowledge] = useState(false)
   const chatMutation = useChatWithAgent()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory } = useAgentHistory(selectedAgentId?.toString() || null)
+  const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory, isError, error } = useAgentHistory(selectedAgentId?.toString() || null)
+
+  // Debug: Log hook state changes
+  useEffect(() => {
+    console.log('🔧 useAgentHistory hook state:', {
+      agentIdPassed: selectedAgentId?.toString() || null,
+      isLoading: isLoadingHistory,
+      hasData: !!historyData,
+      dataLength: historyData?.length || 0,
+      isError,
+      error: error?.message
+    })
+  }, [historyData, isLoadingHistory, selectedAgentId, isError, error])
 
   useEffect(() => {
     const agentParam = searchParams.get('agent')
@@ -32,6 +44,14 @@ export function ChatPage() {
       }
     }
   }, [searchParams, agents])
+
+  // Debug: Log when selectedAgentId changes
+  useEffect(() => {
+    console.log('🆔 selectedAgentId changed:', selectedAgentId, 'type:', typeof selectedAgentId)
+    if (selectedAgentId) {
+      console.log('🆔 Will fetch history for agent string:', selectedAgentId.toString())
+    }
+  }, [selectedAgentId])
 
   // Load conversation history when agent is selected
   useEffect(() => {

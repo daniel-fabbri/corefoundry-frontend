@@ -41,7 +41,13 @@ export function useChatWithAgent() {
 export function useAgentHistory(agentId: string | null, limit = 50) {
   return useQuery({
     queryKey: ['agents', agentId, 'history', limit],
-    queryFn: () => getAgentHistory(agentId!, limit),
+    queryFn: () => {
+      console.log('🔍 Fetching history for agent:', agentId, 'limit:', limit)
+      return getAgentHistory(agentId!, limit)
+    },
     enabled: !!agentId,
+    staleTime: 0, // Always refetch
+    refetchOnMount: true,
+    refetchOnWindowFocus: false,
   })
 }
