@@ -15,12 +15,18 @@ export function ChatPage() {
   const [searchParams] = useSearchParams()
   const { data: agents } = useAgents()
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null)
-  const [messages, setMessages] = useState<Array<{ role: 'user' | 'assistant'; content: string }>>([])
+  const [messages, setMessages] = useState<Array<{ 
+    role: 'user' | 'assistant'; 
+    content: string;
+    timestamp?: number;
+    responseTime?: number;
+  }>>([])
   const [input, setInput] = useState('')
   const [useKnowledge, setUseKnowledge] = useState(false)
   const chatMutation = useChatWithAgent()
   const messagesEndRef = useRef<HTMLDivElement>(null)
   const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory, isError, error } = useAgentHistory(selectedAgentId?.toString() || null)
+  const requestStartTimeRef = useRef<number>(0)
 
   // Debug: Log hook state changes
   useEffect(() => {
@@ -66,7 +72,9 @@ export function ChatPage() {
       if (historyData && historyData.length > 0) {
         const loadedMessages = historyData.map(msg => ({
           role: msg.role as 'user' | 'assistant',
-          content: msg.content
+          content: msg.content,
+          timestamp: msg.created_at ? new Date(msg.created_at).getTime() : undefined,
+          responseTime: undefined // Historical messages don't have response time
         }))
         setMessages(loadedMessages)
         console.log('📜 Loaded chat history:', loadedMessages.length, 'messages')
@@ -87,7 +95,15 @@ export function ChatPage() {
     
     const userMessage = input
     setInput('')
-    setMessages(prev => [...prev, { role: 'user', content: userMessage }])
+    
+    // Mark start time for response measurement
+    requestStartTimeRef.current = Date.now()
+    
+    setMessages(prev => [...prev, { 
+      role: 'user', 
+      content: userMessage,
+      timestamp: Date.now()
+    }])
 
     console.log('💬 Sending chat message:', {
       agentId: selectedAgentId,
@@ -102,7 +118,12 @@ export function ChatPage() {
       },
       {
         onSuccess: (data) => {
+          // Calculate response time in seconds
+          const responseTimeMs = Date.now() - requestStartTimeRef.current
+          const responseTimeSec = (responseTimeMs / 1000).toFixed(2)
+          
           console.log('✅ Chat response received:', data)
+          console.log(`⏱️ Response time: ${responseTimeSec}s (${responseTimeMs}ms)`)
           
           // Check if response contains error from backend
           if (data.metadata?.error || data.response.includes('Error communicating with Ollama')) {
@@ -119,14 +140,25 @@ export function ChatPage() {
             
             setMessages(prev => [...prev, { 
               role: 'assistant', 
-              content: errorMsg
+              content: errorMsg,
+              timestamp: Date.now(),
+              responseTime: responseTimeMs
             }])
           } else {
-            setMessages(prev => [...prev, { role: 'assistant', content: data.response }])
+            setMessages(prev => [...prev, { 
+              role: 'assistant', 
+              content: data.response,
+              timestamp: Date.now(),
+              responseTime: responseTimeMs
+            }])
           }
         },
         onError: (error) => {
+          const responseTimeMs = Date.now() - requestStartTimeRef.current
+          
           console.error('❌ Chat error:', error)
+          console.log(`⏱️ Error occurred after: ${(responseTimeMs / 1000).toFixed(2)}s`)
+          
           let errorMsg = 'Sorry, I encountered an error processing your message.'
           
           if (error.message.includes('Ollama')) {
@@ -139,7 +171,9 @@ export function ChatPage() {
           
           setMessages(prev => [...prev, { 
             role: 'assistant', 
-            content: errorMsg
+            content: errorMsg,
+            timestamp: Date.now(),
+            responseTime: responseTimeMs
           }])
         }
       }
@@ -318,6 +352,11 @@ export function ChatPage() {
                         </div>
                         <div className={`rounded-lg p-3 ${msg.role === 'user' ? 'bg-primary text-primary-foreground' : 'bg-muted'}`}>
                           <p className="text-sm whitespace-pre-wrap">{msg.content}</p>
+                          {msg.role === 'assistant' && msg.responseTime !== undefined && (
+                            <p className="text-xs opacity-70 mt-2 italic">
+                              ⏱️ Response time: {(msg.responseTime / 1000).toFixed(2)}s
+                            </p>
+                          )}
                         </div>
                       </div>
                     </div>
