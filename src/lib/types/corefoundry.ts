@@ -28,9 +28,11 @@ export interface CreateAgentRequest {
 }
 
 export interface ChatMessage {
+  id?: number
   role: 'user' | 'assistant'
   content: string
-  timestamp?: string
+  created_at?: string
+  metadata?: Record<string, unknown>
 }
 
 export interface ChatRequest {

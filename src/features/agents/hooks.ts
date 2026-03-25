@@ -38,10 +38,10 @@ export function useChatWithAgent() {
   })
 }
 
-export function useAgentHistory(agentId: string, limit = 50) {
+export function useAgentHistory(agentId: string | null, limit = 50) {
   return useQuery({
     queryKey: ['agents', agentId, 'history', limit],
-    queryFn: () => getAgentHistory(agentId, limit),
-    enabled: false,
+    queryFn: () => getAgentHistory(agentId!, limit),
+    enabled: !!agentId,
   })
 }

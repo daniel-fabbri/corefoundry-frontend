@@ -9,7 +9,7 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { EmptyState } from '@/components/common/EmptyState'
-import { useAgents, useChatWithAgent } from '@/features/agents/hooks'
+import { useAgents, useChatWithAgent, useAgentHistory } from '@/features/agents/hooks'
 
 export function ChatPage() {
   const [searchParams] = useSearchParams()
@@ -20,6 +20,7 @@ export function ChatPage() {
   const [useKnowledge, setUseKnowledge] = useState(false)
   const chatMutation = useChatWithAgent()
   const messagesEndRef = useRef<HTMLDivElement>(null)
+  const { data: historyData } = useAgentHistory(selectedAgentId?.toString() || null)
 
   useEffect(() => {
     const agentParam = searchParams.get('agent')
@@ -31,6 +32,22 @@ export function ChatPage() {
       }
     }
   }, [searchParams, agents])
+
+  // Load conversation history when agent is selected
+  useEffect(() => {
+    if (historyData && historyData.length > 0) {
+      const loadedMessages = historyData.map(msg => ({
+        role: msg.role as 'user' | 'assistant',
+        content: msg.content
+      }))
+      setMessages(loadedMessages)
+      console.log('📜 Loaded chat history:', loadedMessages.length, 'messages')
+    } else if (selectedAgentId && historyData) {
+      // Agent selected but no history - clear messages
+      setMessages([])
+      console.log('📜 No chat history for agent', selectedAgentId)
+    }
+  }, [historyData, selectedAgentId])
 
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: 'smooth' })
