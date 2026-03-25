@@ -3,10 +3,13 @@ import react from '@vitejs/plugin-react'
 import path from 'path'
 import tailwindcss from '@tailwindcss/vite'
 
-export default defineConfig(({ mode }) => ({
-  base: mode === 'production' ? '/corefoundry-frontend/' : '/',
+export default defineConfig({
+  base: '/',
   build: {
-    outDir: 'docs',
+    outDir: 'dist',
+  },
+  server: {
+    allowedHosts: true, // Allow all hosts (ngrok, tunnels, etc.)
   },
   plugins: [react(), tailwindcss()],
   resolve: {
@@ -14,4 +17,4 @@ export default defineConfig(({ mode }) => ({
       '@': path.resolve(__dirname, './src'),
     },
   },
-}))
+})
