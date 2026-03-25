@@ -12,6 +12,9 @@ dist
 dist-ssr
 *.local
 
+# Keep docs folder for GitHub Pages
+!docs
+
 # Environment variables
 .env
 .env.local

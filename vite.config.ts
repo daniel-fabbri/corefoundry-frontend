@@ -5,6 +5,9 @@ import tailwindcss from '@tailwindcss/vite'
 
 export default defineConfig(({ mode }) => ({
   base: mode === 'production' ? '/corefoundry-frontend/' : '/',
+  build: {
+    outDir: 'docs',
+  },
   plugins: [react(), tailwindcss()],
   resolve: {
     alias: {
