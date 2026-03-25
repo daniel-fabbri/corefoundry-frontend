@@ -147,7 +147,7 @@ export function ChatPage() {
                 <strong>Debug Mode:</strong> Logs are active. Check browser console (F12) for details.
               </AlertDescription>
             </Alert>
- 
+  
             <div className="space-y-2">
               <Label htmlFor="agent-select">Agent</Label>
               <Select 
