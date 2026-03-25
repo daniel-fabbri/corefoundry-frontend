@@ -278,45 +278,6 @@ export function ChatPage() {
                 Clear Chat
               </Button>
             )}
-
-            <div className="pt-4 border-t">
-              <Button 
-                variant="secondary" 
-                size="sm" 
-                className="w-full"
-                onClick={async () => {
-                  if (!selectedAgentId) {
-                    alert('Please select an agent first')
-                    return
-                  }
-                  
-                  console.log('🧪 Testing direct API call with agent:', selectedAgentId)
-                  
-                  try {
-                    const response = await fetch(`https://5c76-2804-14d-5c41-9977-a417-c16c-a3a1-d0a2.ngrok-free.app/agents/${selectedAgentId}/chat`, {
-                      method: 'POST',
-                      headers: {
-                        'Content-Type': 'application/json',
-                        'ngrok-skip-browser-warning': 'true',
-                      },
-                      body: JSON.stringify({
-                        input: 'Test message from frontend',
-                        use_knowledge: false
-                      })
-                    })
-                    
-                    const data = await response.json()
-                    console.log('🧪 Test response:', data)
-                    alert(`Status: ${response.status}\n\nResponse: ${JSON.stringify(data, null, 2)}`)
-                  } catch (error) {
-                    console.error('🧪 Test error:', error)
-                    alert(`Error: ${error}`)
-                  }
-                }}
-              >
-                🧪 Test Direct API Call
-              </Button>
-            </div>
           </CardContent>
         </Card>
 
