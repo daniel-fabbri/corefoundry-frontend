@@ -1,5 +1,8 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
+import { HomePage } from '@/pages/HomePage'
+import { LoginPage } from '@/pages/LoginPage'
+import { RegisterPage } from '@/pages/RegisterPage'
 import { DashboardPage } from '@/pages/DashboardPage'
 import { AgentsPage } from '@/pages/AgentsPage'
 import { AgentDetailPage } from '@/pages/AgentDetailPage'
@@ -7,14 +10,34 @@ import { ChatPage } from '@/pages/ChatPage'
 import { KnowledgePage } from '@/pages/KnowledgePage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
+import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 
 export const router = createBrowserRouter([
+  // Public routes
   {
     path: '/',
-    element: <AppShell />,
+    element: <HomePage />,
+    errorElement: <ErrorBoundary />,
+  },
+  {
+    path: '/login',
+    element: <LoginPage />,
+  },
+  {
+    path: '/register',
+    element: <RegisterPage />,
+  },
+  // Protected routes
+  {
+    path: '/',
+    element: (
+      <ProtectedRoute>
+        <AppShell />
+      </ProtectedRoute>
+    ),
     errorElement: <ErrorBoundary />,
     children: [
-      { index: true, element: <DashboardPage /> },
+      { path: 'dashboard', element: <DashboardPage /> },
       { path: 'agents', element: <AgentsPage /> },
       { path: 'agents/:id', element: <AgentDetailPage /> },
       { path: 'chat', element: <ChatPage /> },

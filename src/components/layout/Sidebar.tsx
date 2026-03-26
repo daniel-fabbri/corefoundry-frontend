@@ -3,7 +3,7 @@ import { LayoutDashboard, Bot, MessageSquare, BookOpen, Settings } from 'lucide-
 import { cn } from '@/lib/utils'
 
 const navItems = [
-  { to: '/', icon: LayoutDashboard, label: 'Dashboard' },
+  { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/agents', icon: Bot, label: 'Agents' },
   { to: '/chat', icon: MessageSquare, label: 'Chat' },
   { to: '/knowledge', icon: BookOpen, label: 'Knowledge' },
@@ -24,7 +24,7 @@ export function Sidebar() {
       </div>
       <nav className="flex-1 p-4 space-y-1">
         {navItems.map(({ to, icon: Icon, label }) => {
-          const isActive = to === '/' ? location.pathname === '/' : location.pathname.startsWith(to)
+          const isActive = location.pathname === to || (to !== '/dashboard' && location.pathname.startsWith(to))
           return (
             <Link key={to} to={to} className={cn('flex items-center gap-3 px-3 py-2 rounded-md text-sm font-medium transition-colors', isActive ? 'bg-primary text-primary-foreground' : 'text-muted-foreground hover:text-foreground hover:bg-accent')}>
               <Icon className="h-4 w-4" />{label}
