@@ -9,12 +9,15 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { EmptyState } from '@/components/common/EmptyState'
-import { useAgents, useChatWithAgent, useAgentHistory } from '@/features/agents/hooks'
+import { useAgents, useChatWithAgent, useAgentHistory, useChatUsers, useAgentThreads, useCreateAgentThread } from '@/features/agents/hooks'
 
 export function ChatPage() {
   const [searchParams] = useSearchParams()
   const { data: agents } = useAgents()
+  const { data: users } = useChatUsers()
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null)
+  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
+  const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null)
   const [messages, setMessages] = useState<Array<{ 
     role: 'user' | 'assistant'; 
     content: string;
@@ -24,8 +27,14 @@ export function ChatPage() {
   const [input, setInput] = useState('')
   const [useKnowledge, setUseKnowledge] = useState(false)
   const chatMutation = useChatWithAgent()
+  const createThreadMutation = useCreateAgentThread()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory, isError, error } = useAgentHistory(selectedAgentId?.toString() || null)
+  const { data: threads } = useAgentThreads(selectedAgentId?.toString() || null, selectedUserId?.toString() || null)
+  const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory, isError, error } = useAgentHistory(
+    selectedAgentId?.toString() || null,
+    selectedUserId?.toString() || null,
+    selectedThreadId?.toString() || null,
+  )
   const requestStartTimeRef = useRef<number>(0)
 
   // Debug: Log hook state changes
@@ -39,6 +48,13 @@ export function ChatPage() {
       error: error?.message
     })
   }, [historyData, isLoadingHistory, selectedAgentId, isError, error])
+
+  useEffect(() => {
+    if (!users || users.length === 0) return
+    if (!selectedUserId) {
+      setSelectedUserId(users[0].id)
+    }
+  }, [users, selectedUserId])
 
   useEffect(() => {
     const agentParam = searchParams.get('agent')
@@ -58,6 +74,19 @@ export function ChatPage() {
       console.log('🆔 Will fetch history for agent string:', selectedAgentId.toString())
     }
   }, [selectedAgentId])
+
+  useEffect(() => {
+    if (!threads || threads.length === 0) {
+      setSelectedThreadId(null)
+      return
+    }
+
+    const hasSelectedThread = selectedThreadId && threads.some((thread) => thread.id === selectedThreadId)
+    if (!hasSelectedThread) {
+      setSelectedThreadId(threads[0].id)
+      setMessages([])
+    }
+  }, [threads, selectedThreadId])
 
   // Load conversation history when agent is selected
   useEffect(() => {
@@ -91,7 +120,7 @@ export function ChatPage() {
   }, [messages])
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedAgentId) return
+    if (!input.trim() || !selectedAgentId || !selectedUserId || !selectedThreadId) return
     
     const userMessage = input
     setInput('')
@@ -114,7 +143,12 @@ export function ChatPage() {
     chatMutation.mutate(
       { 
         agentId: selectedAgentId, 
-        payload: { input: userMessage, use_knowledge: useKnowledge } 
+        payload: {
+          input: userMessage,
+          use_knowledge: useKnowledge,
+          user_id: selectedUserId,
+          thread_id: selectedThreadId,
+        }
       },
       {
         onSuccess: (data) => {
@@ -181,6 +215,7 @@ export function ChatPage() {
   }
 
   const selectedAgent = agents?.find(a => a.id === selectedAgentId)
+  const selectedUser = users?.find(u => u.id === selectedUserId)
 
   return (
     <div className="space-y-6 h-full flex flex-col">
@@ -209,6 +244,7 @@ export function ChatPage() {
                 onValueChange={(v) => {
                   const agentId = parseInt(v, 10)
                   setSelectedAgentId(agentId)
+                  setSelectedThreadId(null)
                   setMessages([]) // Clear messages when switching agents
                   console.log('🤖 Agent selected:', agentId, agents?.find(a => a.id === agentId))
                   console.log('🔄 History will be loaded for agent:', agentId)
@@ -227,10 +263,83 @@ export function ChatPage() {
               </Select>
             </div>
 
+            <div className="space-y-2">
+              <Label htmlFor="user-select">User</Label>
+              <Select
+                value={selectedUserId?.toString() || ''}
+                onValueChange={(v) => {
+                  const userId = parseInt(v, 10)
+                  setSelectedUserId(userId)
+                  setSelectedThreadId(null)
+                  setMessages([])
+                }}
+              >
+                <SelectTrigger id="user-select">
+                  <SelectValue placeholder="Select a user" />
+                </SelectTrigger>
+                <SelectContent>
+                  {users?.map(user => (
+                    <SelectItem key={user.id} value={user.id.toString()}>
+                      {user.name}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <div className="space-y-2">
+              <Label htmlFor="thread-select">Thread</Label>
+              <Select
+                value={selectedThreadId?.toString() || ''}
+                onValueChange={(v) => {
+                  const threadId = parseInt(v, 10)
+                  setSelectedThreadId(threadId)
+                  setMessages([])
+                }}
+              >
+                <SelectTrigger id="thread-select" disabled={!selectedAgentId || !selectedUserId}>
+                  <SelectValue placeholder="Select a thread" />
+                </SelectTrigger>
+                <SelectContent>
+                  {threads?.map(thread => (
+                    <SelectItem key={thread.id} value={thread.id.toString()}>
+                      {thread.title}
+                    </SelectItem>
+                  ))}
+                </SelectContent>
+              </Select>
+            </div>
+
+            <Button
+              variant="outline"
+              size="sm"
+              className="w-full"
+              disabled={!selectedAgentId || !selectedUserId || createThreadMutation.isPending}
+              onClick={() => {
+                if (!selectedAgentId || !selectedUserId) return
+                createThreadMutation.mutate(
+                  {
+                    agentId: selectedAgentId.toString(),
+                    userId: selectedUserId.toString(),
+                    title: `Thread ${new Date().toLocaleString()}`,
+                  },
+                  {
+                    onSuccess: (thread) => {
+                      setSelectedThreadId(thread.id)
+                      setMessages([])
+                    },
+                  },
+                )
+              }}
+            >
+              {createThreadMutation.isPending ? 'Creating Thread...' : 'New Thread'}
+            </Button>
+
             {selectedAgent && (
               <div className="space-y-2 p-3 bg-muted rounded-md">
                 <p className="text-xs text-muted-foreground">Selected Agent</p>
                 <p className="font-medium text-sm">{selectedAgent.name}</p>
+                {selectedUser && <p className="text-xs text-muted-foreground">User: {selectedUser.name}</p>}
                 <p className="text-xs text-muted-foreground">Model: {selectedAgent.model_name}</p>
                 <p className="text-xs font-mono text-destructive">ID: {selectedAgent.id}</p>
                 {selectedAgent.config && (
@@ -253,7 +362,7 @@ export function ChatPage() {
               />
             </div>
 
-            {selectedAgentId && (
+            {selectedAgentId && selectedUserId && selectedThreadId && (
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -292,6 +401,18 @@ export function ChatPage() {
                   icon={Bot} 
                   title="Select an agent" 
                   description="Choose an agent from the sidebar to start chatting"
+                />
+              ) : !selectedUserId ? (
+                <EmptyState
+                  icon={MessageSquare}
+                  title="Select a user"
+                  description="Choose a user to load available threads"
+                />
+              ) : !selectedThreadId ? (
+                <EmptyState
+                  icon={MessageSquare}
+                  title="Select a thread"
+                  description="Choose a thread or create a new one"
                 />
               ) : messages.length === 0 ? (
                 <EmptyState 
@@ -344,12 +465,12 @@ export function ChatPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                placeholder={selectedAgentId ? "Type your message..." : "Select an agent first..."}
-                disabled={chatMutation.isPending || !selectedAgentId}
+                placeholder={selectedAgentId && selectedUserId && selectedThreadId ? "Type your message..." : "Select agent, user and thread first..."}
+                disabled={chatMutation.isPending || !selectedAgentId || !selectedUserId || !selectedThreadId}
               />
               <Button 
                 onClick={handleSend} 
-                disabled={chatMutation.isPending || !input.trim() || !selectedAgentId}
+                disabled={chatMutation.isPending || !input.trim() || !selectedAgentId || !selectedUserId || !selectedThreadId}
               >
                 <Send className="h-4 w-4" />
               </Button>

@@ -35,8 +35,25 @@ export interface ChatMessage {
   metadata?: Record<string, unknown>
 }
 
+export interface ChatUser {
+  id: number
+  name: string
+  created_at: string
+}
+
+export interface ChatThread {
+  id: number
+  agent_id: number
+  user_id: number
+  title: string
+  created_at: string
+  updated_at: string
+}
+
 export interface ChatRequest {
   input: string
+  user_id: number
+  thread_id: number
   use_knowledge?: boolean
 }
 

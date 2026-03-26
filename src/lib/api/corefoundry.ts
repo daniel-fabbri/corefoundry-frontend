@@ -6,6 +6,8 @@ import type {
   ChatMessage,
   ChatRequest,
   ChatResponse,
+  ChatUser,
+  ChatThread,
   KnowledgeUploadRequest,
   KnowledgeUploadResponse,
   KnowledgeSearchRequest,
@@ -44,9 +46,43 @@ export const chatWithAgent = async (agentId: number, payload: ChatRequest): Prom
   return data
 }
 
-export const getAgentHistory = async (agentId: string, limit = 50): Promise<ChatMessage[]> => {
+export const getAgentHistory = async (
+  agentId: string,
+  userId: string,
+  threadId: string,
+  limit = 50,
+): Promise<ChatMessage[]> => {
   const { data } = await http.get<ChatMessage[]>(`/agents/${agentId}/history`, {
-    params: { limit },
+    params: { user_id: userId, thread_id: threadId, limit },
+  })
+  return data
+}
+
+export const getChatUsers = async (): Promise<ChatUser[]> => {
+  const { data } = await http.get<ChatUser[]>('/agents/chat-users')
+  return data
+}
+
+export const createChatUser = async (name: string): Promise<ChatUser> => {
+  const { data } = await http.post<ChatUser>('/agents/chat-users', { name })
+  return data
+}
+
+export const getAgentThreads = async (agentId: string, userId: string): Promise<ChatThread[]> => {
+  const { data } = await http.get<ChatThread[]>(`/agents/${agentId}/threads`, {
+    params: { user_id: userId },
+  })
+  return data
+}
+
+export const createAgentThread = async (
+  agentId: string,
+  userId: string,
+  title?: string,
+): Promise<ChatThread> => {
+  const { data } = await http.post<ChatThread>(`/agents/${agentId}/threads`, {
+    user_id: Number(userId),
+    title,
   })
   return data
 }
