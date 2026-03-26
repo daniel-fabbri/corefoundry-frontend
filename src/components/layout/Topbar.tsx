@@ -1,4 +1,5 @@
 import { useQuery } from '@tanstack/react-query'
+import { useNavigate } from 'react-router-dom'
 import { Activity, AlertCircle, LogOut, User } from 'lucide-react'
 import { getHealth } from '@/lib/api/corefoundry'
 import { BASE_URL } from '@/lib/api/http'
@@ -9,7 +10,14 @@ import { useAuth } from '@/lib/contexts/AuthContext'
 export function Topbar() {
   const { data, isError } = useQuery({ queryKey: ['health'], queryFn: getHealth, refetchInterval: 30000 })
   const { user, logout } = useAuth()
+  const navigate = useNavigate()
   const isHealthy = !isError && data?.status === 'ok'
+  
+  const handleLogout = () => {
+    logout()
+    navigate('/')
+  }
+  
   return (
     <header className="fixed top-0 left-64 right-0 h-14 border-b border-border bg-card/80 backdrop-blur-sm flex items-center justify-between px-6 z-10">
       <div className="flex items-center gap-2">
@@ -29,7 +37,7 @@ export function Topbar() {
               <User className="h-3 w-3 text-muted-foreground" />
               <span className="text-sm font-medium">{user.username}</span>
             </div>
-            <Button variant="ghost" size="sm" onClick={logout} className="h-8">
+            <Button variant="ghost" size="sm" onClick={handleLogout} className="h-8">
               <LogOut className="h-4 w-4" />
             </Button>
           </div>

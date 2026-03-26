@@ -1,5 +1,4 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
-import { useNavigate } from 'react-router-dom'
 
 interface User {
   id: number
@@ -24,7 +23,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [token, setToken] = useState<string | null>(null)
   const [isLoading, setIsLoading] = useState(true)
-  const navigate = useNavigate()
 
   useEffect(() => {
     // Check for stored token on mount
@@ -56,8 +54,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     localStorage.setItem('auth_token', data.access_token)
     localStorage.setItem('auth_user', JSON.stringify(data.user))
-    
-    navigate('/dashboard')
   }
 
   const register = async (email: string, username: string, password: string) => {
@@ -78,8 +74,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     
     localStorage.setItem('auth_token', data.access_token)
     localStorage.setItem('auth_user', JSON.stringify(data.user))
-    
-    navigate('/dashboard')
   }
 
   const logout = () => {
@@ -87,7 +81,6 @@ export function AuthProvider({ children }: { children: ReactNode }) {
     setUser(null)
     localStorage.removeItem('auth_token')
     localStorage.removeItem('auth_user')
-    navigate('/')
   }
 
   return (
