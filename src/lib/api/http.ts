@@ -1,6 +1,8 @@
 import axios from 'axios'
 
-const BASE_URL = import.meta.env.VITE_COREFOUNDRY_API_URL || 'http://localhost:8000'
+const BASE_URL = import.meta.env.DEV
+  ? (import.meta.env.VITE_COREFOUNDRY_API_URL || 'http://localhost:8000/api')
+  : '/api'
 
 export const http = axios.create({
   baseURL: BASE_URL,
