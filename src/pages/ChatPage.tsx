@@ -29,13 +29,26 @@ export function ChatPage() {
   const chatMutation = useChatWithAgent()
   const createThreadMutation = useCreateAgentThread()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { data: threads } = useAgentThreads(selectedAgentId?.toString() || null, user?.id.toString() || null)
+  const { data: threads, isLoading: isLoadingThreads, error: threadsError } = useAgentThreads(selectedAgentId?.toString() || null, user?.id.toString() || null)
   const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory, isError, error } = useAgentHistory(
     selectedAgentId?.toString() || null,
     user?.id.toString() || null,
     selectedThreadId?.toString() || null,
   )
   const requestStartTimeRef = useRef<number>(0)
+
+  // Debug: Log threads state
+  useEffect(() => {
+    console.log('🧵 Threads state:', {
+      agentId: selectedAgentId,
+      userId: user?.id,
+      isLoading: isLoadingThreads,
+      hasThreads: !!threads,
+      threadCount: threads?.length || 0,
+      threads: threads,
+      error: threadsError
+    })
+  }, [threads, isLoadingThreads, selectedAgentId, user?.id, threadsError])
 
   // Debug: Log hook state changes
   useEffect(() => {
@@ -267,8 +280,16 @@ export function ChatPage() {
                   setMessages([])
                 }}
               >
-                <SelectTrigger id="thread-select" disabled={!selectedAgentId || !user?.id}>
-                  <SelectValue placeholder="Select a thread" />
+                <SelectTrigger id="thread-select" disabled={!selectedAgentId || !user?.id || isLoadingThreads}>
+                  <SelectValue placeholder={
+                    isLoadingThreads 
+                      ? "Loading threads..." 
+                      : threadsError 
+                        ? "Error loading threads" 
+                        : threads?.length === 0 
+                          ? "No threads - create one below" 
+                          : "Select a thread"
+                  } />
                 </SelectTrigger>
                 <SelectContent>
                   {threads?.map(thread => (
@@ -278,6 +299,11 @@ export function ChatPage() {
                   ))}
                 </SelectContent>
               </Select>
+              {threadsError && (
+                <p className="text-xs text-destructive">
+                  Error: {threadsError instanceof Error ? threadsError.message : 'Failed to load threads'}
+                </p>
+              )}
             </div>
 
             <Button
