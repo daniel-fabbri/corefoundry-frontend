@@ -9,14 +9,14 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from '@
 import { Switch } from '@/components/ui/switch'
 import { Alert, AlertDescription } from '@/components/ui/alert'
 import { EmptyState } from '@/components/common/EmptyState'
-import { useAgents, useChatWithAgent, useAgentHistory, useChatUsers, useAgentThreads, useCreateAgentThread } from '@/features/agents/hooks'
+import { useAuth } from '@/lib/contexts/AuthContext'
+import { useAgents, useChatWithAgent, useAgentHistory, useAgentThreads, useCreateAgentThread } from '@/features/agents/hooks'
 
 export function ChatPage() {
   const [searchParams] = useSearchParams()
+  const { user } = useAuth()
   const { data: agents } = useAgents()
-  const { data: users } = useChatUsers()
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null)
-  const [selectedUserId, setSelectedUserId] = useState<number | null>(null)
   const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null)
   const [messages, setMessages] = useState<Array<{ 
     role: 'user' | 'assistant'; 
@@ -29,10 +29,10 @@ export function ChatPage() {
   const chatMutation = useChatWithAgent()
   const createThreadMutation = useCreateAgentThread()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { data: threads } = useAgentThreads(selectedAgentId?.toString() || null, selectedUserId?.toString() || null)
+  const { data: threads } = useAgentThreads(selectedAgentId?.toString() || null, user?.id.toString() || null)
   const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory, isError, error } = useAgentHistory(
     selectedAgentId?.toString() || null,
-    selectedUserId?.toString() || null,
+    user?.id.toString() || null,
     selectedThreadId?.toString() || null,
   )
   const requestStartTimeRef = useRef<number>(0)
@@ -49,12 +49,7 @@ export function ChatPage() {
     })
   }, [historyData, isLoadingHistory, selectedAgentId, isError, error])
 
-  useEffect(() => {
-    if (!users || users.length === 0) return
-    if (!selectedUserId) {
-      setSelectedUserId(users[0].id)
-    }
-  }, [users, selectedUserId])
+
 
   useEffect(() => {
     const agentParam = searchParams.get('agent')
@@ -120,7 +115,7 @@ export function ChatPage() {
   }, [messages])
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedAgentId || !selectedUserId || !selectedThreadId) return
+    if (!input.trim() || !selectedAgentId || !user?.id || !selectedThreadId) return
     
     const userMessage = input
     setInput('')
@@ -146,7 +141,7 @@ export function ChatPage() {
         payload: {
           input: userMessage,
           use_knowledge: useKnowledge,
-          user_id: selectedUserId,
+          user_id: user.id,
           thread_id: selectedThreadId,
         }
       },
@@ -215,7 +210,6 @@ export function ChatPage() {
   }
 
   const selectedAgent = agents?.find(a => a.id === selectedAgentId)
-  const selectedUser = users?.find(u => u.id === selectedUserId)
 
   return (
     <div className="space-y-6 h-full flex flex-col">
@@ -264,30 +258,6 @@ export function ChatPage() {
             </div>
 
             <div className="space-y-2">
-              <Label htmlFor="user-select">User</Label>
-              <Select
-                value={selectedUserId?.toString() || ''}
-                onValueChange={(v) => {
-                  const userId = parseInt(v, 10)
-                  setSelectedUserId(userId)
-                  setSelectedThreadId(null)
-                  setMessages([])
-                }}
-              >
-                <SelectTrigger id="user-select">
-                  <SelectValue placeholder="Select a user" />
-                </SelectTrigger>
-                <SelectContent>
-                  {users?.map(user => (
-                    <SelectItem key={user.id} value={user.id.toString()}>
-                      {user.name}
-                    </SelectItem>
-                  ))}
-                </SelectContent>
-              </Select>
-            </div>
-
-            <div className="space-y-2">
               <Label htmlFor="thread-select">Thread</Label>
               <Select
                 value={selectedThreadId?.toString() || ''}
@@ -297,7 +267,7 @@ export function ChatPage() {
                   setMessages([])
                 }}
               >
-                <SelectTrigger id="thread-select" disabled={!selectedAgentId || !selectedUserId}>
+                <SelectTrigger id="thread-select" disabled={!selectedAgentId || !user?.id}>
                   <SelectValue placeholder="Select a thread" />
                 </SelectTrigger>
                 <SelectContent>
@@ -314,13 +284,13 @@ export function ChatPage() {
               variant="outline"
               size="sm"
               className="w-full"
-              disabled={!selectedAgentId || !selectedUserId || createThreadMutation.isPending}
+              disabled={!selectedAgentId || !user?.id || createThreadMutation.isPending}
               onClick={() => {
-                if (!selectedAgentId || !selectedUserId) return
+                if (!selectedAgentId || !user?.id) return
                 createThreadMutation.mutate(
                   {
                     agentId: selectedAgentId.toString(),
-                    userId: selectedUserId.toString(),
+                    userId: user.id.toString(),
                     title: `Thread ${new Date().toLocaleString()}`,
                   },
                   {
@@ -339,7 +309,7 @@ export function ChatPage() {
               <div className="space-y-2 p-3 bg-muted rounded-md">
                 <p className="text-xs text-muted-foreground">Selected Agent</p>
                 <p className="font-medium text-sm">{selectedAgent.name}</p>
-                {selectedUser && <p className="text-xs text-muted-foreground">User: {selectedUser.name}</p>}
+                {user && <p className="text-xs text-muted-foreground">User: {user.username}</p>}
                 <p className="text-xs text-muted-foreground">Model: {selectedAgent.model_name}</p>
                 <p className="text-xs font-mono text-destructive">ID: {selectedAgent.id}</p>
                 {selectedAgent.config && (
@@ -362,7 +332,7 @@ export function ChatPage() {
               />
             </div>
 
-            {selectedAgentId && selectedUserId && selectedThreadId && (
+            {selectedAgentId && user?.id && selectedThreadId && (
               <Button 
                 variant="outline" 
                 size="sm" 
@@ -401,12 +371,6 @@ export function ChatPage() {
                   icon={Bot} 
                   title="Select an agent" 
                   description="Choose an agent from the sidebar to start chatting"
-                />
-              ) : !selectedUserId ? (
-                <EmptyState
-                  icon={MessageSquare}
-                  title="Select a user"
-                  description="Choose a user to load available threads"
                 />
               ) : !selectedThreadId ? (
                 <EmptyState
@@ -465,12 +429,12 @@ export function ChatPage() {
                 value={input}
                 onChange={(e) => setInput(e.target.value)}
                 onKeyDown={(e) => e.key === 'Enter' && !e.shiftKey && handleSend()}
-                placeholder={selectedAgentId && selectedUserId && selectedThreadId ? "Type your message..." : "Select agent, user and thread first..."}
-                disabled={chatMutation.isPending || !selectedAgentId || !selectedUserId || !selectedThreadId}
+                placeholder={selectedAgentId && user?.id && selectedThreadId ? "Type your message..." : "Select agent and thread first..."}
+                disabled={chatMutation.isPending || !selectedAgentId || !user?.id || !selectedThreadId}
               />
               <Button 
                 onClick={handleSend} 
-                disabled={chatMutation.isPending || !input.trim() || !selectedAgentId || !selectedUserId || !selectedThreadId}
+                disabled={chatMutation.isPending || !input.trim() || !selectedAgentId || !user?.id || !selectedThreadId}
               >
                 <Send className="h-4 w-4" />
               </Button>
