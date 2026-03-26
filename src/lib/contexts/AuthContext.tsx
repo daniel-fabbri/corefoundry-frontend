@@ -1,4 +1,5 @@
 import { createContext, useContext, useState, useEffect, ReactNode } from 'react'
+import * as api from '@/lib/api/corefoundry'
 
 interface User {
   id: number
@@ -37,43 +38,29 @@ export function AuthProvider({ children }: { children: ReactNode }) {
   }, [])
 
   const login = async (email: string, password: string) => {
-    const response = await fetch('http://localhost:8000/api/auth/login', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, password }),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.detail || 'Login failed')
+    try {
+      const data = await api.login({ email, password })
+      setToken(data.access_token)
+      setUser(data.user)
+      
+      localStorage.setItem('auth_token', data.access_token)
+      localStorage.setItem('auth_user', JSON.stringify(data.user))
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || 'Login failed')
     }
-
-    const data = await response.json()
-    setToken(data.access_token)
-    setUser(data.user)
-    
-    localStorage.setItem('auth_token', data.access_token)
-    localStorage.setItem('auth_user', JSON.stringify(data.user))
   }
 
   const register = async (email: string, username: string, password: string) => {
-    const response = await fetch('http://localhost:8000/api/auth/register', {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify({ email, username, password }),
-    })
-
-    if (!response.ok) {
-      const error = await response.json()
-      throw new Error(error.detail || 'Registration failed')
+    try {
+      const data = await api.register({ email, username, password })
+      setToken(data.access_token)
+      setUser(data.user)
+      
+      localStorage.setItem('auth_token', data.access_token)
+      localStorage.setItem('auth_user', JSON.stringify(data.user))
+    } catch (error: any) {
+      throw new Error(error.response?.data?.detail || 'Registration failed')
     }
-
-    const data = await response.json()
-    setToken(data.access_token)
-    setUser(data.user)
-    
-    localStorage.setItem('auth_token', data.access_token)
-    localStorage.setItem('auth_user', JSON.stringify(data.user))
   }
 
   const logout = () => {

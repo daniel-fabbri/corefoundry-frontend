@@ -110,3 +110,45 @@ export const deleteKnowledgeChunk = async (chunkId: string): Promise<void> => {
 export const deleteKnowledgeSource = async (source: string): Promise<void> => {
   await http.delete(`/knowledge/source/${source}`)
 }
+
+// Authentication
+export interface AuthUser {
+  id: number
+  email: string
+  username: string
+  created_at: string
+}
+
+export interface AuthResponse {
+  access_token: string
+  token_type: string
+  user: AuthUser
+}
+
+export interface LoginRequest {
+  email: string
+  password: string
+}
+
+export interface RegisterRequest {
+  email: string
+  username: string
+  password: string
+}
+
+export const login = async (payload: LoginRequest): Promise<AuthResponse> => {
+  const { data } = await http.post<AuthResponse>('/auth/login', payload)
+  return data
+}
+
+export const register = async (payload: RegisterRequest): Promise<AuthResponse> => {
+  const { data } = await http.post<AuthResponse>('/auth/register', payload)
+  return data
+}
+
+export const getMe = async (token: string): Promise<AuthUser> => {
+  const { data } = await http.get<AuthUser>('/auth/me', {
+    headers: { Authorization: `Bearer ${token}` }
+  })
+  return data
+}
