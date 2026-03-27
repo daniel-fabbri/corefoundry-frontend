@@ -10,7 +10,7 @@ export function AppShell() {
     <div className="min-h-screen bg-background">
       <Sidebar isOpen={sidebarOpen} onClose={() => setSidebarOpen(false)} />
       <Topbar onMenuClick={() => setSidebarOpen(true)} />
-      <main className="lg:ml-64 pt-14 p-4 sm:p-6"><Outlet /></main>
+      <main className="lg:ml-64 pt-16 px-4 pb-6 sm:px-6"><Outlet /></main>
     </div>
   )
 }

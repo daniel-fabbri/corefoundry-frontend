@@ -161,6 +161,38 @@ export const getAgentMemories = async (agentId: string): Promise<Memory[]> => {
   return data
 }
 
+export interface SaveMemoryRequest {
+  key: string
+  value: string
+  metadata?: Record<string, any>
+}
+
+export interface UpdateMemoryRequest {
+  value: string
+  metadata?: Record<string, any>
+}
+
+export const saveAgentMemory = async (
+  agentId: string,
+  payload: SaveMemoryRequest
+): Promise<Memory> => {
+  const { data } = await http.post<Memory>(`/agents/${agentId}/memories`, payload)
+  return data
+}
+
+export const updateAgentMemory = async (
+  agentId: string,
+  key: string,
+  payload: UpdateMemoryRequest
+): Promise<Memory> => {
+  const { data } = await http.put<Memory>(`/agents/${agentId}/memories/${key}`, payload)
+  return data
+}
+
+export const deleteAgentMemory = async (agentId: string, key: string): Promise<void> => {
+  await http.delete(`/agents/${agentId}/memories/${key}`)
+}
+
 // Knowledge Files
 export const uploadKnowledgeFile = async (
   agentId: string,

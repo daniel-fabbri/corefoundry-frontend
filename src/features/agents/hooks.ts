@@ -13,9 +13,14 @@ import {
   getAgentThreads,
   createAgentThread,
   getAgentMemories,
+  saveAgentMemory,
+  updateAgentMemory,
+  deleteAgentMemory,
   uploadKnowledgeFile,
   getKnowledgeFiles,
   deleteKnowledgeFile,
+  type SaveMemoryRequest,
+  type UpdateMemoryRequest,
 } from '@/lib/api/corefoundry'
 import type { CreateAgentRequest, UpdateAgentRequest, ChatRequest } from '@/lib/types/corefoundry'
 
@@ -126,6 +131,51 @@ export function useAgentMemories(agentId: string | null) {
     queryKey: ['agents', agentId, 'memories'],
     queryFn: () => getAgentMemories(agentId!),
     enabled: !!agentId,
+  })
+}
+
+export function useSaveAgentMemory() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ agentId, payload }: { agentId: string; payload: SaveMemoryRequest }) =>
+      saveAgentMemory(agentId, payload),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['agents', variables.agentId, 'memories'] })
+      toast.success('Memory saved successfully')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to save memory')
+    },
+  })
+}
+
+export function useUpdateAgentMemory() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ agentId, key, payload }: { agentId: string; key: string; payload: UpdateMemoryRequest }) =>
+      updateAgentMemory(agentId, key, payload),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['agents', variables.agentId, 'memories'] })
+      toast.success('Memory updated successfully')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to update memory')
+    },
+  })
+}
+
+export function useDeleteAgentMemory() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ agentId, key }: { agentId: string; key: string }) =>
+      deleteAgentMemory(agentId, key),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['agents', variables.agentId, 'memories'] })
+      toast.success('Memory deleted successfully')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to delete memory')
+    },
   })
 }
 

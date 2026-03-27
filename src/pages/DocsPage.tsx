@@ -30,6 +30,10 @@ export function DocsPage() {
         { id: 'knowledge-list', label: 'List Knowledge' },
         { id: 'knowledge-upload', label: 'Upload Knowledge' },
         { id: 'knowledge-delete', label: 'Delete Knowledge' },
+        { id: 'memory-list', label: 'List Memories' },
+        { id: 'memory-create', label: 'Create Memory' },
+        { id: 'memory-update', label: 'Update Memory' },
+        { id: 'memory-delete', label: 'Delete Memory' },
       ],
     },
     {
@@ -38,6 +42,7 @@ export function DocsPage() {
         { id: 'model-user', label: 'User' },
         { id: 'model-agent', label: 'Agent' },
         { id: 'model-knowledge', label: 'Knowledge' },
+        { id: 'model-memory', label: 'Memory' },
         { id: 'model-message', label: 'Message' },
       ],
     },
@@ -129,10 +134,11 @@ export function DocsPage() {
                 <h4 className="font-semibold mb-2">Key Features:</h4>
                 <ul className="list-disc list-inside space-y-1 text-sm text-muted-foreground">
                   <li>RESTful endpoints for all operations</li>
-                  <li>JWT-based authentication</li>
+                  <li>JWT-based authentication + API Keys for programmatic access</li>
                   <li>Multi-user support with data isolation</li>
                   <li>Thread-based conversation management</li>
                   <li>Document upload and RAG (Retrieval-Augmented Generation)</li>
+                  <li>Hybrid memory system (auto-extracted + manual management)</li>
                 </ul>
               </div>
             </section>
@@ -605,6 +611,166 @@ title: string (optional)`}</pre>
                   </div>
                 </div>
               </section>
+
+              <section id="memory-list" className="mb-8 scroll-mt-8">
+                <div className="border border-border rounded-lg p-6">
+                  <div className="flex items-center mb-4">
+                    <span className="bg-blue-500/20 text-blue-400 px-3 py-1 rounded text-sm font-mono mr-3">
+                      GET
+                    </span>
+                    <code className="text-lg font-mono">/agents/:agent_id/memories</code>
+                  </div>
+                  <p className="text-muted-foreground mb-4">
+                    List all memories for a specific agent. Returns both auto-extracted and manually created memories.
+                  </p>
+                  
+                  <h4 className="font-semibold mb-2">Parameters:</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm mb-4">
+                    <pre className="text-muted-foreground">agent_id: integer (path parameter)</pre>
+                  </div>
+
+                  <h4 className="font-semibold mb-2">Response (200):</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm">
+                    <pre className="text-muted-foreground">{`[
+  {
+    "id": 1,
+    "agent_id": 1,
+    "key": "user_name",
+    "value": "João",
+    "metadata": {
+      "auto_extracted": true,
+      "source": "conversation"
+    },
+    "created_at": "2024-03-27T10:00:00",
+    "updated_at": "2024-03-27T10:00:00"
+  }
+]`}</pre>
+                  </div>
+                </div>
+              </section>
+
+              <section id="memory-create" className="mb-8 scroll-mt-8">
+                <div className="border border-border rounded-lg p-6">
+                  <div className="flex items-center mb-4">
+                    <span className="bg-green-500/20 text-green-400 px-3 py-1 rounded text-sm font-mono mr-3">
+                      POST
+                    </span>
+                    <code className="text-lg font-mono">/agents/:agent_id/memories</code>
+                  </div>
+                  <p className="text-muted-foreground mb-4">
+                    Create a new memory or update an existing one (upsert). If a memory with the same key already exists, it will be updated.
+                  </p>
+                  
+                  <h4 className="font-semibold mb-2">Parameters:</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm mb-4">
+                    <pre className="text-muted-foreground">agent_id: integer (path parameter)</pre>
+                  </div>
+
+                  <h4 className="font-semibold mb-2">Request Body:</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm mb-4">
+                    <pre className="text-muted-foreground">{`{
+  "key": "project_name",
+  "value": "CoreFoundry",
+  "metadata": {
+    "category": "project",
+    "importance": "high"
+  }
+}`}</pre>
+                  </div>
+
+                  <h4 className="font-semibold mb-2">Response (200):</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm">
+                    <pre className="text-muted-foreground">{`{
+  "id": 2,
+  "agent_id": 1,
+  "key": "project_name",
+  "value": "CoreFoundry",
+  "metadata": {
+    "category": "project",
+    "importance": "high"
+  },
+  "created_at": "2024-03-27T10:05:00",
+  "updated_at": "2024-03-27T10:05:00"
+}`}</pre>
+                  </div>
+                </div>
+              </section>
+
+              <section id="memory-update" className="mb-8 scroll-mt-8">
+                <div className="border border-border rounded-lg p-6">
+                  <div className="flex items-center mb-4">
+                    <span className="bg-yellow-500/20 text-yellow-400 px-3 py-1 rounded text-sm font-mono mr-3">
+                      PUT
+                    </span>
+                    <code className="text-lg font-mono">/agents/:agent_id/memories/:key</code>
+                  </div>
+                  <p className="text-muted-foreground mb-4">
+                    Update an existing memory by its key. The key cannot be changed, only the value and metadata.
+                  </p>
+                  
+                  <h4 className="font-semibold mb-2">Parameters:</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm mb-4">
+                    <pre className="text-muted-foreground">{`agent_id: integer (path parameter)
+key: string (path parameter)`}</pre>
+                  </div>
+
+                  <h4 className="font-semibold mb-2">Request Body:</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm mb-4">
+                    <pre className="text-muted-foreground">{`{
+  "value": "CoreFoundry v2",
+  "metadata": {
+    "category": "project",
+    "importance": "critical",
+    "updated_by": "user"
+  }
+}`}</pre>
+                  </div>
+
+                  <h4 className="font-semibold mb-2">Response (200):</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm">
+                    <pre className="text-muted-foreground">{`{
+  "id": 2,
+  "agent_id": 1,
+  "key": "project_name",
+  "value": "CoreFoundry v2",
+  "metadata": {
+    "category": "project",
+    "importance": "critical",
+    "updated_by": "user"
+  },
+  "created_at": "2024-03-27T10:05:00",
+  "updated_at": "2024-03-27T10:15:00"
+}`}</pre>
+                  </div>
+                </div>
+              </section>
+
+              <section id="memory-delete" className="mb-8 scroll-mt-8">
+                <div className="border border-border rounded-lg p-6">
+                  <div className="flex items-center mb-4">
+                    <span className="bg-red-500/20 text-red-400 px-3 py-1 rounded text-sm font-mono mr-3">
+                      DELETE
+                    </span>
+                    <code className="text-lg font-mono">/agents/:agent_id/memories/:key</code>
+                  </div>
+                  <p className="text-muted-foreground mb-4">
+                    Delete a specific memory by its key. This is permanent and cannot be undone.
+                  </p>
+                  
+                  <h4 className="font-semibold mb-2">Parameters:</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm mb-4">
+                    <pre className="text-muted-foreground">{`agent_id: integer (path parameter)
+key: string (path parameter)`}</pre>
+                  </div>
+
+                  <h4 className="font-semibold mb-2">Response (200):</h4>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm">
+                    <pre className="text-muted-foreground">{`{
+  "message": "Memory 'project_name' deleted successfully"
+}`}</pre>
+                  </div>
+                </div>
+              </section>
             </div>
 
             {/* Data Models */}
@@ -664,6 +830,31 @@ title: string (optional)`}</pre>
   "agent_id": integer (optional),
   "user_id": integer,
   "uploaded_at": datetime
+}`}</pre>
+                  </div>
+                </div>
+              </section>
+
+              <section id="model-memory" className="mb-8 scroll-mt-8">
+                <div className="border border-border rounded-lg p-6">
+                  <h3 className="text-xl font-semibold mb-3">Memory</h3>
+                  <p className="text-muted-foreground mb-4">
+                    Represents a key-value memory stored for an agent. Memories can be auto-extracted from conversations or manually created.
+                  </p>
+                  <div className="bg-black/40 rounded-lg p-4 font-mono text-sm">
+                    <pre className="text-muted-foreground">{`{
+  "id": integer,
+  "agent_id": integer,
+  "key": string (unique per agent),
+  "value": string,
+  "metadata": object {
+    "auto_extracted": boolean,
+    "source": string,
+    "category": string (optional),
+    "importance": string (optional)
+  },
+  "created_at": datetime,
+  "updated_at": datetime
 }`}</pre>
                   </div>
                 </div>
