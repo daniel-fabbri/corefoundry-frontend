@@ -65,11 +65,11 @@ export function useCreateChatUser() {
   })
 }
 
-export function useAgentThreads(agentId: string | null, userId: string | null) {
+export function useAgentThreads(agentId: string | null) {
   return useQuery({
-    queryKey: ['agents', agentId, 'users', userId, 'threads'],
-    queryFn: () => getAgentThreads(agentId!, userId!),
-    enabled: !!agentId && !!userId,
+    queryKey: ['agents', agentId, 'threads'],
+    queryFn: () => getAgentThreads(agentId!),
+    enabled: !!agentId,
     refetchOnWindowFocus: false,
   })
 }
@@ -77,24 +77,24 @@ export function useAgentThreads(agentId: string | null, userId: string | null) {
 export function useCreateAgentThread() {
   const qc = useQueryClient()
   return useMutation({
-    mutationFn: ({ agentId, userId, title }: { agentId: string; userId: string; title?: string }) =>
-      createAgentThread(agentId, userId, title),
+    mutationFn: ({ agentId, title }: { agentId: string; title?: string }) =>
+      createAgentThread(agentId, title),
     onSuccess: (thread) => {
-      qc.invalidateQueries({ queryKey: ['agents', String(thread.agent_id), 'users', String(thread.user_id), 'threads'] })
+      qc.invalidateQueries({ queryKey: ['agents', String(thread.agent_id), 'threads'] })
       toast.success('Thread created successfully')
     },
     onError: (err: Error) => { toast.error(err.message || 'Failed to create thread') },
   })
 }
 
-export function useAgentHistory(agentId: string | null, userId: string | null, threadId: string | null, limit = 50) {
+export function useAgentHistory(agentId: string | null, threadId: string | null, limit = 50) {
   return useQuery({
-    queryKey: ['agents', agentId, 'users', userId, 'threads', threadId, 'history', limit],
+    queryKey: ['agents', agentId, 'threads', threadId, 'history', limit],
     queryFn: () => {
-      console.log('🔍 Fetching history for agent/thread:', { agentId, userId, threadId, limit })
-      return getAgentHistory(agentId!, userId!, threadId!, limit)
+      console.log('🔍 Fetching history for agent/thread:', { agentId, threadId, limit })
+      return getAgentHistory(agentId!, threadId!, limit)
     },
-    enabled: !!agentId && !!userId && !!threadId,
+    enabled: !!agentId && !!threadId,
     staleTime: 0, // Always refetch
     refetchOnMount: true,
     refetchOnWindowFocus: false,

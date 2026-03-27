@@ -23,6 +23,9 @@ export function HomePage() {
             <Link to="/register">
               <Button size="lg" variant="outline">Sign Up</Button>
             </Link>
+            <Link to="/about">
+              <Button size="lg" variant="ghost">Learn More</Button>
+            </Link>
           </div>
         </div>
 

@@ -52,7 +52,6 @@ export interface ChatThread {
 
 export interface ChatRequest {
   input: string
-  user_id: number
   thread_id: number
   use_knowledge?: boolean
 }

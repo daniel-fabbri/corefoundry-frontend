@@ -29,10 +29,9 @@ export function ChatPage() {
   const chatMutation = useChatWithAgent()
   const createThreadMutation = useCreateAgentThread()
   const messagesEndRef = useRef<HTMLDivElement>(null)
-  const { data: threads, isLoading: isLoadingThreads, error: threadsError } = useAgentThreads(selectedAgentId?.toString() || null, user?.id.toString() || null)
+  const { data: threads, isLoading: isLoadingThreads, error: threadsError } = useAgentThreads(selectedAgentId?.toString() || null)
   const { data: historyData, isLoading: isLoadingHistory, refetch: refetchHistory, isError, error } = useAgentHistory(
     selectedAgentId?.toString() || null,
-    user?.id.toString() || null,
     selectedThreadId?.toString() || null,
   )
   const requestStartTimeRef = useRef<number>(0)
@@ -41,14 +40,13 @@ export function ChatPage() {
   useEffect(() => {
     console.log('🧵 Threads state:', {
       agentId: selectedAgentId,
-      userId: user?.id,
       isLoading: isLoadingThreads,
       hasThreads: !!threads,
       threadCount: threads?.length || 0,
       threads: threads,
       error: threadsError
     })
-  }, [threads, isLoadingThreads, selectedAgentId, user?.id, threadsError])
+  }, [threads, isLoadingThreads, selectedAgentId, threadsError])
 
   // Debug: Log hook state changes
   useEffect(() => {
@@ -128,7 +126,7 @@ export function ChatPage() {
   }, [messages])
 
   const handleSend = async () => {
-    if (!input.trim() || !selectedAgentId || !user?.id || !selectedThreadId) return
+    if (!input.trim() || !selectedAgentId || !selectedThreadId) return
     
     const userMessage = input
     setInput('')
@@ -154,7 +152,6 @@ export function ChatPage() {
         payload: {
           input: userMessage,
           use_knowledge: useKnowledge,
-          user_id: user.id,
           thread_id: selectedThreadId,
         }
       },
@@ -280,7 +277,7 @@ export function ChatPage() {
                   setMessages([])
                 }}
               >
-                <SelectTrigger id="thread-select" disabled={!selectedAgentId || !user?.id || isLoadingThreads}>
+                <SelectTrigger id="thread-select" disabled={!selectedAgentId || isLoadingThreads}>
                   <SelectValue placeholder={
                     isLoadingThreads 
                       ? "Loading threads..." 
@@ -310,13 +307,12 @@ export function ChatPage() {
               variant="outline"
               size="sm"
               className="w-full"
-              disabled={!selectedAgentId || !user?.id || createThreadMutation.isPending}
+              disabled={!selectedAgentId || createThreadMutation.isPending}
               onClick={() => {
-                if (!selectedAgentId || !user?.id) return
+                if (!selectedAgentId) return
                 createThreadMutation.mutate(
                   {
                     agentId: selectedAgentId.toString(),
-                    userId: user.id.toString(),
                     title: `Thread ${new Date().toLocaleString()}`,
                   },
                   {
@@ -358,7 +354,7 @@ export function ChatPage() {
               />
             </div>
 
-            {selectedAgentId && user?.id && selectedThreadId && (
+            {selectedAgentId && selectedThreadId && (
               <Button 
                 variant="outline" 
                 size="sm" 

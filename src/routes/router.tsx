@@ -9,6 +9,7 @@ import { AgentDetailPage } from '@/pages/AgentDetailPage'
 import { ChatPage } from '@/pages/ChatPage'
 import { KnowledgePage } from '@/pages/KnowledgePage'
 import { SettingsPage } from '@/pages/SettingsPage'
+import AboutPage from '@/pages/AboutPage'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 
@@ -26,6 +27,11 @@ export const router = createBrowserRouter([
   {
     path: '/register',
     element: <RegisterPage />,
+  },
+  {
+    path: '/about',
+    element: <AboutPage />,
+    errorElement: <ErrorBoundary />,
   },
   // Protected routes
   {

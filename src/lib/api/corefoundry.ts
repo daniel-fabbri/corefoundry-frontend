@@ -48,12 +48,11 @@ export const chatWithAgent = async (agentId: number, payload: ChatRequest): Prom
 
 export const getAgentHistory = async (
   agentId: string,
-  userId: string,
   threadId: string,
   limit = 50,
 ): Promise<ChatMessage[]> => {
   const { data } = await http.get<ChatMessage[]>(`/agents/${agentId}/history`, {
-    params: { user_id: userId, thread_id: threadId, limit },
+    params: { thread_id: threadId, limit },
   })
   return data
 }
@@ -68,22 +67,16 @@ export const createChatUser = async (name: string): Promise<ChatUser> => {
   return data
 }
 
-export const getAgentThreads = async (agentId: string, userId: string): Promise<ChatThread[]> => {
-  const { data } = await http.get<ChatThread[]>(`/agents/${agentId}/threads`, {
-    params: { user_id: userId },
-  })
+export const getAgentThreads = async (agentId: string): Promise<ChatThread[]> => {
+  const { data } = await http.get<ChatThread[]>(`/agents/${agentId}/threads`)
   return data
 }
 
 export const createAgentThread = async (
   agentId: string,
-  userId: string,
   title?: string,
 ): Promise<ChatThread> => {
-  const { data } = await http.post<ChatThread>(`/agents/${agentId}/threads`, {
-    user_id: Number(userId),
-    title,
-  })
+  const { data } = await http.post<ChatThread>(`/agents/${agentId}/threads`, { title })
   return data
 }
 
