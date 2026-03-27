@@ -131,6 +131,13 @@ export function ChatPage() {
     const userMessage = input
     setInput('')
     
+    // Debug: Log state before sending
+    console.log('🎯 STATE CHECK before sending:', {
+      useKnowledge,
+      selectedAgentId,
+      selectedThreadId
+    })
+    
     // Mark start time for response measurement
     requestStartTimeRef.current = Date.now()
     
@@ -345,13 +352,56 @@ export function ChatPage() {
               </div>
             )}
 
-            <div className="flex items-center justify-between pt-2">
-              <Label htmlFor="use-knowledge" className="text-sm">Use Knowledge Base</Label>
-              <Switch 
-                id="use-knowledge"
-                checked={useKnowledge} 
-                onCheckedChange={setUseKnowledge}
-              />
+            {/* Knowledge Base Toggle - Visually Enhanced */}
+            <div 
+              className="pt-2 border-2 p-4 rounded-lg transition-colors"
+              style={{
+                backgroundColor: useKnowledge ? '#e8f5e9' : '#fff3e0',
+                borderColor: useKnowledge ? '#4caf50' : '#ff9800'
+              }}
+            >
+              <div className="flex items-center justify-between">
+                <div className="flex flex-col gap-1">
+                  <Label htmlFor="use-knowledge" className="text-sm font-bold">
+                    📚 Use Knowledge Base
+                  </Label>
+                  <span className="text-xs font-medium">
+                    {useKnowledge ? '✅ ENABLED - Searching files' : '❌ DISABLED - Using only training'}
+                  </span>
+                </div>
+                
+                {/* Native Checkbox as Fallback */}
+                <div className="flex flex-col items-center gap-2">
+                  <input
+                    type="checkbox"
+                    id="use-knowledge"
+                    checked={useKnowledge}
+                    onChange={(e) => {
+                      const checked = e.target.checked
+                      console.log('🔄 Knowledge switch toggled:', checked)
+                      setUseKnowledge(checked)
+                    }}
+                    style={{
+                      width: '24px',
+                      height: '24px',
+                      cursor: 'pointer',
+                      accentColor: '#4caf50'
+                    }}
+                  />
+                  <Button
+                    type="button"
+                    variant={useKnowledge ? "default" : "outline"}
+                    size="sm"
+                    onClick={() => {
+                      const newValue = !useKnowledge
+                      console.log('🔄 Knowledge button clicked:', newValue)
+                      setUseKnowledge(newValue)
+                    }}
+                  >
+                    {useKnowledge ? 'ON' : 'OFF'}
+                  </Button>
+                </div>
+              </div>
             </div>
 
             {selectedAgentId && selectedThreadId && (
