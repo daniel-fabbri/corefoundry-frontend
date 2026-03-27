@@ -34,7 +34,7 @@ const SelectContent = React.forwardRef<HTMLDivElement, React.HTMLAttributes<HTML
   ({ className, children, ...props }, ref) => {
     const { open, setOpen } = React.useContext(SelectContext)
     if (!open) return null
-    return <><div className="fixed inset-0 z-40" onClick={() => setOpen(false)} /><div ref={ref} className={cn('absolute top-full z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border bg-background text-foreground shadow-md', className)} {...props}>{children}</div></>
+    return <><div className="fixed inset-0 z-40" onClick={() => setOpen(false)} /><div ref={ref} className={cn('absolute top-full z-50 mt-1 max-h-60 w-full overflow-auto rounded-md border border-border bg-popover text-popover-foreground shadow-md', className)} {...props}>{children}</div></>
   }
 )
 SelectContent.displayName = 'SelectContent'

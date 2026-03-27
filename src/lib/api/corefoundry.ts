@@ -185,12 +185,12 @@ export const updateAgentMemory = async (
   key: string,
   payload: UpdateMemoryRequest
 ): Promise<Memory> => {
-  const { data } = await http.put<Memory>(`/agents/${agentId}/memories/${key}`, payload)
+  const { data } = await http.put<Memory>(`/agents/${agentId}/memories/${encodeURIComponent(key)}`, payload)
   return data
 }
 
 export const deleteAgentMemory = async (agentId: string, key: string): Promise<void> => {
-  await http.delete(`/agents/${agentId}/memories/${key}`)
+  await http.delete(`/agents/${agentId}/memories/${encodeURIComponent(key)}`)
 }
 
 // Knowledge Files
