@@ -95,3 +95,29 @@ export interface KnowledgeChunk {
 export interface KnowledgeSearchResponse {
   results: KnowledgeChunk[]
 }
+
+// Memory
+export interface Memory {
+  id: number
+  agent_id: number
+  key: string
+  value: string
+  metadata?: Record<string, unknown>
+  created_at: string
+  updated_at: string
+}
+
+// Knowledge Files
+export interface KnowledgeFile {
+  filename: string
+  size: number
+  created_at: string
+  agent_id: number
+}
+
+export interface KnowledgeFileUploadResponse {
+  message: string
+  filename: string
+  chunks_created: number
+  agent_id: number
+}

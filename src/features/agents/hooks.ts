@@ -11,6 +11,10 @@ import {
   createChatUser,
   getAgentThreads,
   createAgentThread,
+  getAgentMemories,
+  uploadKnowledgeFile,
+  getKnowledgeFiles,
+  deleteKnowledgeFile,
 } from '@/lib/api/corefoundry'
 import type { CreateAgentRequest, ChatRequest } from '@/lib/types/corefoundry'
 
@@ -98,5 +102,53 @@ export function useAgentHistory(agentId: string | null, threadId: string | null,
     staleTime: 0, // Always refetch
     refetchOnMount: true,
     refetchOnWindowFocus: false,
+  })
+}
+
+// Memory hooks
+export function useAgentMemories(agentId: string | null) {
+  return useQuery({
+    queryKey: ['agents', agentId, 'memories'],
+    queryFn: () => getAgentMemories(agentId!),
+    enabled: !!agentId,
+  })
+}
+
+// Knowledge files hooks
+export function useKnowledgeFiles(agentId: string | null) {
+  return useQuery({
+    queryKey: ['agents', agentId, 'knowledge', 'files'],
+    queryFn: () => getKnowledgeFiles(agentId!),
+    enabled: !!agentId,
+  })
+}
+
+export function useUploadKnowledgeFile() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ agentId, file }: { agentId: string; file: File }) =>
+      uploadKnowledgeFile(agentId, file),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['agents', variables.agentId, 'knowledge', 'files'] })
+      toast.success('File uploaded successfully')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to upload file')
+    },
+  })
+}
+
+export function useDeleteKnowledgeFile() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ agentId, filename }: { agentId: string; filename: string }) =>
+      deleteKnowledgeFile(agentId, filename),
+    onSuccess: (_, variables) => {
+      qc.invalidateQueries({ queryKey: ['agents', variables.agentId, 'knowledge', 'files'] })
+      toast.success('File deleted successfully')
+    },
+    onError: (err: Error) => {
+      toast.error(err.message || 'Failed to delete file')
+    },
   })
 }

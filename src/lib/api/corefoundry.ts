@@ -13,6 +13,9 @@ import type {
   KnowledgeSearchRequest,
   KnowledgeSearchResponse,
   KnowledgeChunk,
+  Memory,
+  KnowledgeFile,
+  KnowledgeFileUploadResponse,
 } from '../types/corefoundry'
 
 // Health
@@ -144,4 +147,39 @@ export const getMe = async (token: string): Promise<AuthUser> => {
     headers: { Authorization: `Bearer ${token}` }
   })
   return data
+}
+
+// Memory
+export const getAgentMemories = async (agentId: string): Promise<Memory[]> => {
+  const { data } = await http.get<Memory[]>(`/agents/${agentId}/memories`)
+  return data
+}
+
+// Knowledge Files
+export const uploadKnowledgeFile = async (
+  agentId: string,
+  file: File
+): Promise<KnowledgeFileUploadResponse> => {
+  const formData = new FormData()
+  formData.append('file', file)
+  
+  const { data } = await http.post<KnowledgeFileUploadResponse>(
+    `/agents/${agentId}/knowledge/upload`,
+    formData,
+    {
+      headers: {
+        'Content-Type': 'multipart/form-data',
+      },
+    }
+  )
+  return data
+}
+
+export const getKnowledgeFiles = async (agentId: string): Promise<KnowledgeFile[]> => {
+  const { data } = await http.get<KnowledgeFile[]>(`/agents/${agentId}/knowledge/files`)
+  return data
+}
+
+export const deleteKnowledgeFile = async (agentId: string, filename: string): Promise<void> => {
+  await http.delete(`/agents/${agentId}/knowledge/files/${filename}`)
 }

@@ -7,6 +7,8 @@ import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
 import { ConfirmDialog } from '@/components/common/ConfirmDialog'
 import { ErrorState } from '@/components/common/ErrorState'
+import { AgentMemories } from '@/components/agents/AgentMemories'
+import { AgentKnowledge } from '@/components/agents/AgentKnowledge'
 
 export function AgentDetailPage() {
   const { id } = useParams<{ id: string }>()
@@ -54,6 +56,12 @@ export function AgentDetailPage() {
             <MessageSquare className="h-4 w-4" />Chat with Agent
           </Link>
         <Button variant="destructive" onClick={() => setDeleteOpen(true)}><Trash2 className="h-4 w-4" />Delete Agent</Button>
+      </div>
+
+      {/* Knowledge Base and Memories */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-4">
+        <AgentKnowledge agentId={id!} />
+        <AgentMemories agentId={id!} />
       </div>
 
       <ConfirmDialog open={deleteOpen} onOpenChange={setDeleteOpen} title="Delete Agent" description={`Are you sure you want to delete "${agent.name}"? This action cannot be undone.`} loading={deleteAgent.isPending} onConfirm={handleDelete} />
