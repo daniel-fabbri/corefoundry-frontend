@@ -90,9 +90,13 @@ export function AgentKnowledge({ agentId }: AgentKnowledgeProps) {
 
   const handleDownload = async (filename: string) => {
     try {
-      const token = localStorage.getItem('token')
+      const token = localStorage.getItem('auth_token')
+      const baseURL = import.meta.env.DEV
+        ? (import.meta.env.VITE_COREFOUNDRY_API_URL || 'http://localhost:8000/api')
+        : '/api'
+      
       const response = await fetch(
-        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/agents/${agentId}/knowledge/files/${filename}`,
+        `${baseURL}/agents/${agentId}/knowledge/files/${encodeURIComponent(filename)}`,
         {
           headers: {
             'Authorization': `Bearer ${token}`

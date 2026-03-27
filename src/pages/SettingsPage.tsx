@@ -94,9 +94,9 @@ export function SettingsPage() {
   }
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-6 max-w-5xl">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Settings</h1>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Settings</h1>
         <p className="text-muted-foreground mt-1">Manage your account and API keys</p>
       </div>
 
@@ -111,7 +111,7 @@ export function SettingsPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleUpdateProfile} className="space-y-4">
-            <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-4">
               <div className="space-y-2">
                 <Label htmlFor="email">Email</Label>
                 <Input
@@ -135,7 +135,7 @@ export function SettingsPage() {
 
             <div className="border-t pt-4 mt-4">
               <h3 className="text-sm font-semibold mb-3">Change Password</h3>
-              <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+              <div className="grid grid-cols-1 gap-4">
                 <div className="space-y-2">
                   <Label htmlFor="current-password">Current Password</Label>
                   <Input
@@ -190,27 +190,27 @@ export function SettingsPage() {
         <CardContent className="space-y-6">
           {/* Show newly created key */}
           {newlyCreatedKey && (
-            <Alert className="border-green-600 dark:border-green-500 bg-green-50/50 dark:bg-green-950/50">
-              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
+            <Alert className="border-green-600 dark:border-green-600 bg-transparent">
+              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-500" />
               <AlertDescription>
                 <div className="space-y-2">
-                  <p className="font-semibold text-green-800 dark:text-green-200">
+                  <p className="font-semibold text-foreground">
                     API Key Created Successfully!
                   </p>
-                  <p className="text-sm text-green-700 dark:text-green-300">
+                  <p className="text-sm text-muted-foreground">
                     Copy this key now - it won't be shown again:
                   </p>
                   <div className="flex gap-2 mt-2">
                     <Input
                       value={newlyCreatedKey}
                       readOnly
-                      className="font-mono text-sm bg-background border-green-200 dark:border-green-800"
+                      className="font-mono text-sm bg-background border-green-600 dark:border-green-600"
                     />
                     <Button
                       size="sm"
                       onClick={() => handleCopyKey(newlyCreatedKey)}
                       variant="outline"
-                      className="border-green-600 dark:border-green-500 hover:bg-green-100 dark:hover:bg-green-900"
+                      className="border-green-600 dark:border-green-600 text-green-600 dark:text-green-500 hover:bg-green-600/10"
                     >
                       <Copy className="h-4 w-4 mr-1" />
                       Copy

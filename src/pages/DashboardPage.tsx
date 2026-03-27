@@ -13,13 +13,13 @@ export function DashboardPage() {
   const agents = useQuery({ queryKey: ['agents'], queryFn: getAgents })
 
   return (
-    <div className="space-y-6">
+    <div className="space-y-4 sm:space-y-6">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Dashboard</h1>
-        <p className="text-muted-foreground mt-1">Overview of your CoreFoundry instance</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Dashboard</h1>
+        <p className="text-sm text-muted-foreground mt-1">Overview of your CoreFoundry instance</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-3 gap-4">
+      <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
         <Card>
           <CardHeader className="flex flex-row items-center justify-between pb-2">
             <CardTitle className="text-sm font-medium">API Health</CardTitle>
@@ -75,14 +75,14 @@ export function DashboardPage() {
               {agents.data.slice(0, 5).map(agent => (
                 <Link key={agent.id} to={`/agents/${agent.id}`}>
                   <div className="flex items-center justify-between p-3 rounded-md border border-border hover:bg-accent transition-colors">
-                    <div className="flex items-center gap-3">
-                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center"><Bot className="h-4 w-4 text-primary" /></div>
-                      <div>
-                        <p className="text-sm font-medium">{agent.name}</p>
-                        <p className="text-xs text-muted-foreground font-mono">ID: {agent.id}</p>
+                    <div className="flex items-center gap-3 min-w-0 flex-1">
+                      <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><Bot className="h-4 w-4 text-primary" /></div>
+                      <div className="min-w-0 flex-1">
+                        <p className="text-sm font-medium truncate">{agent.name}</p>
+                        <p className="text-xs text-muted-foreground font-mono truncate">ID: {agent.id}</p>
                       </div>
                     </div>
-                    <Badge variant="outline">View</Badge>
+                    <Badge variant="outline" className="flex-shrink-0">View</Badge>
                   </div>
                 </Link>
               ))}

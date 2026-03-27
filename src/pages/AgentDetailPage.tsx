@@ -79,9 +79,18 @@ export function AgentDetailPage() {
 
   return (
     <div className="space-y-6">
-      <div className="flex items-center gap-4">
-        <Button variant="ghost" size="icon" onClick={() => navigate('/agents')}><ArrowLeft className="h-4 w-4" /></Button>
-        <div><h1 className="text-3xl font-bold">{agent.name}</h1><p className="text-muted-foreground font-mono text-sm">ID: {agent.id}</p></div>
+      <div className="flex flex-col sm:flex-row sm:items-start sm:justify-between gap-4">
+        <div className="flex items-center gap-4">
+          <Button variant="ghost" size="icon" onClick={() => navigate('/agents')}><ArrowLeft className="h-4 w-4" /></Button>
+          <div><h1 className="text-2xl sm:text-3xl font-bold">{agent.name}</h1><p className="text-muted-foreground font-mono text-xs sm:text-sm">ID: {agent.id}</p></div>
+        </div>
+        <div className="flex flex-wrap items-center gap-2">
+          <Link to={`/chat?agent=${agent.id}`} className="inline-flex items-center gap-2 h-10 px-3 sm:px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors">
+            <MessageSquare className="h-4 w-4" /><span className="hidden sm:inline">Chat with Agent</span><span className="sm:hidden">Chat</span>
+          </Link>
+          <Button variant="outline" size="sm" onClick={handleEditOpen} className="h-10"><Edit className="h-4 w-4" /><span className="hidden sm:inline ml-2">Edit</span></Button>
+          <Button variant="destructive" size="sm" onClick={() => setDeleteOpen(true)} className="h-10"><Trash2 className="h-4 w-4" /><span className="hidden sm:inline ml-2">Delete</span></Button>
+        </div>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
@@ -101,14 +110,6 @@ export function AgentDetailPage() {
             <pre className="text-xs font-mono bg-muted p-3 rounded-md overflow-auto max-h-48">{JSON.stringify(agent.config, null, 2)}</pre>
           </CardContent>
         </Card>
-      </div>
-
-      <div className="flex items-center gap-3">
-        <Link to={`/chat?agent=${agent.id}`} className="inline-flex items-center gap-2 h-10 px-4 py-2 bg-primary text-primary-foreground hover:bg-primary/90 rounded-md text-sm font-medium transition-colors">
-            <MessageSquare className="h-4 w-4" />Chat with Agent
-          </Link>
-        <Button variant="outline" onClick={handleEditOpen}><Edit className="h-4 w-4" />Edit Agent</Button>
-        <Button variant="destructive" onClick={() => setDeleteOpen(true)}><Trash2 className="h-4 w-4" />Delete Agent</Button>
       </div>
 
       {/* Knowledge Base and Memories */}

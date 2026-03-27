@@ -1,6 +1,6 @@
 import { useState, useEffect, useRef } from 'react'
 import { useSearchParams } from 'react-router-dom'
-import { Send, MessageSquare, Bot, AlertCircle } from 'lucide-react'
+import { Send, MessageSquare, Bot, AlertCircle, ChevronLeft, ChevronRight } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Input } from '@/components/ui/input'
@@ -17,6 +17,7 @@ export function ChatPage() {
   const { data: agents } = useAgents()
   const [selectedAgentId, setSelectedAgentId] = useState<number | null>(null)
   const [selectedThreadId, setSelectedThreadId] = useState<number | null>(null)
+  const [sidebarOpen, setSidebarOpen] = useState(true)
   const [messages, setMessages] = useState<Array<{ 
     role: 'user' | 'assistant'; 
     content: string;
@@ -228,18 +229,31 @@ export function ChatPage() {
   const selectedAgent = agents?.find(a => a.id === selectedAgentId)
 
   return (
-    <div className="space-y-6 h-full flex flex-col">
+    <div className="space-y-4 sm:space-y-6 h-full flex flex-col">
       <div>
-        <h1 className="text-3xl font-bold text-foreground">Chat</h1>
-        <p className="text-muted-foreground mt-1">Interact with your AI agents</p>
+        <h1 className="text-2xl sm:text-3xl font-bold text-foreground">Chat</h1>
+        <p className="text-sm text-muted-foreground mt-1">Interact with your AI agents</p>
       </div>
 
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-4 flex-1">
-        <Card className="md:col-span-1">
-          <CardHeader>
-            <CardTitle className="text-base">Settings</CardTitle>
-          </CardHeader>
-          <CardContent className="space-y-4">
+      {/* Mobile sidebar toggle */}
+      <Button
+        variant="outline"
+        size="sm"
+        className="lg:hidden w-full justify-between"
+        onClick={() => setSidebarOpen(!sidebarOpen)}
+      >
+        <span>Settings</span>
+        {sidebarOpen ? <ChevronLeft className="h-4 w-4" /> : <ChevronRight className="h-4 w-4" />}
+      </Button>
+
+      <div className="flex flex-col lg:flex-row gap-4 flex-1">
+        {/* Sidebar - collapsible on mobile */}
+        <div className={`w-full lg:w-80 ${sidebarOpen ? 'block' : 'hidden lg:block'}`}>
+          <Card>
+            <CardHeader>
+              <CardTitle className="text-base">Settings</CardTitle>
+            </CardHeader>
+            <CardContent className="space-y-4">
             <Alert>
               <AlertCircle className="h-4 w-4" />
               <AlertDescription className="text-xs">
@@ -265,7 +279,7 @@ export function ChatPage() {
                     {selectedAgent?.name || "Select an agent"}
                   </SelectValue>
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover border-border">
                   {agents?.map(agent => (
                     <SelectItem key={agent.id} value={agent.id.toString()}>
                       {agent.name}
@@ -296,7 +310,7 @@ export function ChatPage() {
                           : "Select a thread"
                   } />
                 </SelectTrigger>
-                <SelectContent>
+                <SelectContent className="bg-popover border-border">
                   {threads?.map(thread => (
                     <SelectItem key={thread.id} value={thread.id.toString()}>
                       {thread.title}
@@ -398,12 +412,15 @@ export function ChatPage() {
             )}
           </CardContent>
         </Card>
+        </div>
 
-        <Card className="md:col-span-3 flex flex-col">
-          <CardHeader>
-            <CardTitle>Conversation</CardTitle>
-          </CardHeader>
-          <CardContent className="flex-1 flex flex-col min-h-0">
+        {/* Chat area - takes remaining space */}
+        <div className="flex-1">
+          <Card className="h-full flex flex-col">
+            <CardHeader>
+              <CardTitle className="text-base">Conversation</CardTitle>
+            </CardHeader>
+            <CardContent className="flex-1 flex flex-col min-h-0">
             <div className="flex-1 overflow-y-auto mb-4 space-y-4 max-h-[calc(100vh-300px)]">
               {!selectedAgentId ? (
                 <EmptyState 
@@ -474,12 +491,14 @@ export function ChatPage() {
               <Button 
                 onClick={handleSend} 
                 disabled={chatMutation.isPending || !input.trim() || !selectedAgentId || !user?.id || !selectedThreadId}
+                size="icon"
               >
                 <Send className="h-4 w-4" />
               </Button>
             </div>
           </CardContent>
         </Card>
+        </div>
       </div>
     </div>
   )

@@ -55,10 +55,10 @@ export function AgentsPage() {
   }
 
   return (
-    <div className="space-y-6">
-      <div className="flex items-center justify-between">
-        <div><h1 className="text-3xl font-bold">Agents</h1><p className="text-muted-foreground mt-1">Manage your AI agents</p></div>
-        <Button onClick={() => setDialogOpen(true)}><Plus className="h-4 w-4" />Create Agent</Button>
+    <div className="space-y-4 sm:space-y-6">
+      <div className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
+        <div><h1 className="text-2xl sm:text-3xl font-bold">Agents</h1><p className="text-sm text-muted-foreground mt-1">Manage your AI agents</p></div>
+        <Button onClick={() => setDialogOpen(true)} className="w-full sm:w-auto"><Plus className="h-4 w-4" />Create Agent</Button>
       </div>
 
       <Card>
@@ -69,16 +69,19 @@ export function AgentsPage() {
           ) : (
             <div className="space-y-2">
               {agents.map(agent => (
-                <div key={agent.id} className="flex items-center justify-between p-3 rounded-md border border-border hover:bg-accent/50 transition-colors">
+                <div key={agent.id} className="flex flex-col sm:flex-row sm:items-center sm:justify-between gap-3 p-3 rounded-md border border-border hover:bg-accent/50 transition-colors">
                   <div className="flex items-center gap-3">
-                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center"><Bot className="h-4 w-4 text-primary" /></div>
-                    <div><p className="font-medium">{agent.name}</p><p className="text-xs text-muted-foreground font-mono">ID: {agent.id}</p></div>
+                    <div className="h-8 w-8 rounded-full bg-primary/10 flex items-center justify-center flex-shrink-0"><Bot className="h-4 w-4 text-primary" /></div>
+                    <div className="min-w-0">
+                      <p className="font-medium truncate">{agent.name}</p>
+                      <p className="text-xs text-muted-foreground font-mono truncate">ID: {agent.id}</p>
+                    </div>
                   </div>
                   <div className="flex items-center gap-2">
-                    <Link to={`/agents/${agent.id}`} className="inline-flex items-center gap-2 h-9 px-3 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors">
-                        <Eye className="h-4 w-4" />View
+                    <Link to={`/agents/${agent.id}`} className="flex-1 sm:flex-initial inline-flex items-center justify-center gap-2 h-9 px-3 border border-input bg-background hover:bg-accent hover:text-accent-foreground rounded-md text-sm font-medium transition-colors">
+                        <Eye className="h-4 w-4" /><span className="hidden sm:inline">View</span>
                       </Link>
-                    <Button variant="destructive" size="sm" onClick={() => setDeleteId(String(agent.id))}><Trash2 className="h-4 w-4" /></Button>
+                    <Button variant="destructive" size="sm" onClick={() => setDeleteId(String(agent.id))}><Trash2 className="h-4 w-4" /><span className="sr-only">Delete</span></Button>
                   </div>
                 </div>
               ))}
