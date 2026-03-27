@@ -3,6 +3,7 @@ import { toast } from 'sonner'
 import {
   getAgents,
   createAgent,
+  updateAgent,
   getAgent,
   deleteAgent,
   chatWithAgent,
@@ -16,7 +17,7 @@ import {
   getKnowledgeFiles,
   deleteKnowledgeFile,
 } from '@/lib/api/corefoundry'
-import type { CreateAgentRequest, ChatRequest } from '@/lib/types/corefoundry'
+import type { CreateAgentRequest, UpdateAgentRequest, ChatRequest } from '@/lib/types/corefoundry'
 
 export const AGENTS_KEY = ['agents']
 
@@ -34,6 +35,20 @@ export function useCreateAgent() {
     mutationFn: (payload: CreateAgentRequest) => createAgent(payload),
     onSuccess: () => { qc.invalidateQueries({ queryKey: AGENTS_KEY }); toast.success('Agent created successfully') },
     onError: (err: Error) => { toast.error(err.message || 'Failed to create agent') },
+  })
+}
+
+export function useUpdateAgent() {
+  const qc = useQueryClient()
+  return useMutation({
+    mutationFn: ({ agentId, payload }: { agentId: string; payload: UpdateAgentRequest }) => 
+      updateAgent(agentId, payload),
+    onSuccess: (agent) => { 
+      qc.invalidateQueries({ queryKey: AGENTS_KEY })
+      qc.invalidateQueries({ queryKey: ['agents', String(agent.id)] })
+      toast.success('Agent updated successfully') 
+    },
+    onError: (err: Error) => { toast.error(err.message || 'Failed to update agent') },
   })
 }
 

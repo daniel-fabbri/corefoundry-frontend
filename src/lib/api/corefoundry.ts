@@ -3,6 +3,7 @@ import type {
   HealthResponse,
   Agent,
   CreateAgentRequest,
+  UpdateAgentRequest,
   ChatMessage,
   ChatRequest,
   ChatResponse,
@@ -32,6 +33,11 @@ export const getAgents = async (): Promise<Agent[]> => {
 
 export const createAgent = async (payload: CreateAgentRequest): Promise<Agent> => {
   const { data } = await http.post<Agent>('/agents/create', payload)
+  return data
+}
+
+export const updateAgent = async (agentId: string, payload: UpdateAgentRequest): Promise<Agent> => {
+  const { data } = await http.put<Agent>(`/agents/${agentId}`, payload)
   return data
 }
 

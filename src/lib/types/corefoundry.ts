@@ -27,6 +27,13 @@ export interface CreateAgentRequest {
   config: AgentConfig
 }
 
+export interface UpdateAgentRequest {
+  name?: string
+  description?: string
+  model_name?: string
+  config?: AgentConfig
+}
+
 export interface ChatMessage {
   id?: number
   role: 'user' | 'assistant'

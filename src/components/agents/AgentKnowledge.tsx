@@ -1,5 +1,5 @@
 import { useState, useRef } from 'react'
-import { FileText, Upload, Trash2, File } from 'lucide-react'
+import { FileText, Upload, Trash2, File, Download } from 'lucide-react'
 import { Card, CardContent, CardHeader, CardTitle } from '@/components/ui/card'
 import { Button } from '@/components/ui/button'
 import { Skeleton } from '@/components/ui/skeleton'
@@ -88,6 +88,38 @@ export function AgentKnowledge({ agentId }: AgentKnowledgeProps) {
     )
   }
 
+  const handleDownload = async (filename: string) => {
+    try {
+      const token = localStorage.getItem('token')
+      const response = await fetch(
+        `${import.meta.env.VITE_API_URL || 'http://localhost:8000'}/api/agents/${agentId}/knowledge/files/${filename}`,
+        {
+          headers: {
+            'Authorization': `Bearer ${token}`
+          }
+        }
+      )
+      
+      if (!response.ok) {
+        throw new Error('Download failed')
+      }
+      
+      const blob = await response.blob()
+      const url = window.URL.createObjectURL(blob)
+      const a = document.createElement('a')
+      a.href = url
+      a.download = filename
+      document.body.appendChild(a)
+      a.click()
+      window.URL.revokeObjectURL(url)
+      document.body.removeChild(a)
+      
+      toast.success('File downloaded successfully')
+    } catch (error) {
+      toast.error('Failed to download file')
+    }
+  }
+
   const formatFileSize = (bytes: number) => {
     if (bytes < 1024) return `${bytes} B`
     if (bytes < 1024 * 1024) return `${(bytes / 1024).toFixed(1)} KB`
@@ -170,14 +202,26 @@ export function AgentKnowledge({ agentId }: AgentKnowledgeProps) {
                       </p>
                     </div>
                   </div>
-                  <Button
-                    variant="ghost"
-                    size="icon"
-                    className="text-destructive hover:text-destructive shrink-0"
-                    onClick={() => handleDeleteClick(file.filename)}
-                  >
-                    <Trash2 className="h-4 w-4" />
-                  </Button>
+                  <div className="flex items-center gap-1 shrink-0">
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="hover:text-primary"
+                      onClick={() => handleDownload(file.filename)}
+                      title="Download file"
+                    >
+                      <Download className="h-4 w-4" />
+                    </Button>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      className="text-destructive hover:text-destructive"
+                      onClick={() => handleDeleteClick(file.filename)}
+                      title="Delete file"
+                    >
+                      <Trash2 className="h-4 w-4" />
+                    </Button>
+                  </div>
                 </div>
               ))}
             </div>

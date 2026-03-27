@@ -190,8 +190,8 @@ export function SettingsPage() {
         <CardContent className="space-y-6">
           {/* Show newly created key */}
           {newlyCreatedKey && (
-            <Alert className="border-green-500 bg-green-50 dark:bg-green-950">
-              <CheckCircle2 className="h-4 w-4 text-green-600" />
+            <Alert className="border-green-600 dark:border-green-500 bg-green-50/50 dark:bg-green-950/50">
+              <CheckCircle2 className="h-4 w-4 text-green-600 dark:text-green-400" />
               <AlertDescription>
                 <div className="space-y-2">
                   <p className="font-semibold text-green-800 dark:text-green-200">
@@ -204,12 +204,13 @@ export function SettingsPage() {
                     <Input
                       value={newlyCreatedKey}
                       readOnly
-                      className="font-mono text-sm bg-white dark:bg-gray-900"
+                      className="font-mono text-sm bg-background border-green-200 dark:border-green-800"
                     />
                     <Button
                       size="sm"
                       onClick={() => handleCopyKey(newlyCreatedKey)}
                       variant="outline"
+                      className="border-green-600 dark:border-green-500 hover:bg-green-100 dark:hover:bg-green-900"
                     >
                       <Copy className="h-4 w-4 mr-1" />
                       Copy

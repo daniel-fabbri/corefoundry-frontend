@@ -12,6 +12,7 @@ export function DocsPage() {
       items: [
         { id: 'introduction', label: 'Introduction' },
         { id: 'authentication', label: 'Authentication' },
+        { id: 'api-keys', label: 'API Keys' },
         { id: 'base-url', label: 'Base URL' },
       ],
     },
@@ -142,15 +143,93 @@ export function DocsPage() {
                 Authentication
               </h2>
               <p className="text-muted-foreground mb-4">
-                CoreFoundry uses JWT (JSON Web Tokens) for authentication. Include the token in the 
-                Authorization header for all protected endpoints.
+                CoreFoundry supports two authentication methods:
               </p>
+              <ul className="list-disc list-inside text-muted-foreground mb-4 space-y-1">
+                <li><strong>JWT Tokens</strong>: For user-based authentication via login</li>
+                <li><strong>API Keys</strong>: For programmatic access and server-to-server communication</li>
+              </ul>
               <div className="bg-black/40 border border-border rounded-lg p-4 font-mono text-sm mb-4">
-                <div className="text-green-400 mb-2"># Example request with authentication</div>
+                <div className="text-green-400 mb-2"># Example request with JWT token</div>
                 <div className="text-muted-foreground">
-                  curl -H "Authorization: Bearer YOUR_TOKEN_HERE" \<br />
+                  curl -H "Authorization: Bearer YOUR_JWT_TOKEN" \<br />
                   &nbsp;&nbsp;&nbsp;&nbsp; https://api.corefoundry.com/api/agents
                 </div>
+              </div>
+            </section>
+
+            <section id="api-keys" className="mb-12 scroll-mt-8">
+              <h2 className="text-3xl font-bold mb-4 flex items-center">
+                <ChevronRight className="h-6 w-6 text-primary mr-2" />
+                API Keys
+              </h2>
+              <p className="text-muted-foreground mb-4">
+                API Keys provide a secure way to authenticate requests without requiring user login. 
+                They are ideal for server-to-server communication, scripts, and automated workflows.
+              </p>
+              
+              <div className="bg-card border border-border rounded-lg p-4 mb-4">
+                <h3 className="font-semibold mb-2 text-foreground">Creating an API Key</h3>
+                <ol className="list-decimal list-inside text-muted-foreground space-y-1">
+                  <li>Go to <Link to="/settings" className="text-primary hover:underline">Settings</Link> page</li>
+                  <li>Scroll to the "API Keys" section</li>
+                  <li>Enter a name for your key (e.g., "Production", "Development")</li>
+                  <li>Click "Create" to generate the key</li>
+                  <li><strong className="text-orange-500">Important:</strong> Copy the key immediately - it won't be shown again!</li>
+                </ol>
+              </div>
+
+              <div className="bg-card border border-border rounded-lg p-4 mb-4">
+                <h3 className="font-semibold mb-2 text-foreground">Using API Keys</h3>
+                <p className="text-muted-foreground mb-3">
+                  Include your API key in the <code className="bg-muted px-1.5 py-0.5 rounded text-sm">X-API-Key</code> header:
+                </p>
+                <div className="bg-black/40 border border-border rounded-lg p-4 font-mono text-sm">
+                  <div className="text-green-400 mb-2"># Example request with API Key</div>
+                  <div className="text-muted-foreground">
+                    curl -H "X-API-Key: cfk_YOUR_API_KEY_HERE" \<br />
+                    &nbsp;&nbsp;&nbsp;&nbsp; https://api.corefoundry.com/api/agents
+                  </div>
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-lg p-4 mb-4">
+                <h3 className="font-semibold mb-2 text-foreground">JavaScript Example</h3>
+                <div className="bg-black/40 border border-border rounded-lg p-4 font-mono text-sm">
+                  <div className="text-purple-400">const</div> response = <div className="text-purple-400">await</div> <div className="text-yellow-400">fetch</div>(<div className="text-green-400">'https://api.corefoundry.com/api/agents'</div>, {'{'}<br />
+                  &nbsp;&nbsp;method: <div className="text-green-400">'GET'</div>,<br />
+                  &nbsp;&nbsp;headers: {'{'}<br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;<div className="text-green-400">'X-API-Key'</div>: <div className="text-green-400">'cfk_your_api_key'</div>,<br />
+                  &nbsp;&nbsp;&nbsp;&nbsp;<div className="text-green-400">'Content-Type'</div>: <div className="text-green-400">'application/json'</div><br />
+                  &nbsp;&nbsp;{'}'}<br />
+                  {'}'})
+                </div>
+              </div>
+
+              <div className="bg-card border border-border rounded-lg p-4">
+                <h3 className="font-semibold mb-2 text-foreground">Python Example</h3>
+                <div className="bg-black/40 border border-border rounded-lg p-4 font-mono text-sm">
+                  <div className="text-purple-400">import</div> requests<br /><br />
+                  headers = {'{'}<br />
+                  &nbsp;&nbsp;<div className="text-green-400">'X-API-Key'</div>: <div className="text-green-400">'cfk_your_api_key'</div>,<br />
+                  &nbsp;&nbsp;<div className="text-green-400">'Content-Type'</div>: <div className="text-green-400">'application/json'</div><br />
+                  {'}'}<br /><br />
+                  response = requests.<div className="text-yellow-400">get</div>(<br />
+                  &nbsp;&nbsp;<div className="text-green-400">'https://api.corefoundry.com/api/agents'</div>,<br />
+                  &nbsp;&nbsp;headers=headers<br />
+                  )
+                </div>
+              </div>
+
+              <div className="bg-yellow-500/10 border border-yellow-500/50 rounded-lg p-4 mt-4">
+                <h3 className="font-semibold mb-2 text-yellow-600 dark:text-yellow-400">Security Best Practices</h3>
+                <ul className="list-disc list-inside text-muted-foreground space-y-1">
+                  <li>Never commit API keys to version control</li>
+                  <li>Use environment variables to store keys</li>
+                  <li>Rotate keys regularly</li>
+                  <li>Delete unused or compromised keys immediately</li>
+                  <li>Use different keys for different environments (dev, staging, prod)</li>
+                </ul>
               </div>
             </section>
 
