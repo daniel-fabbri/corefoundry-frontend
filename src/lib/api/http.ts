@@ -15,11 +15,18 @@ export const http = axios.create({
 
 http.interceptors.request.use(
   (config) => {
+    // Add authentication token if available
+    const token = localStorage.getItem('auth_token')
+    if (token) {
+      config.headers.Authorization = `Bearer ${token}`
+    }
+    
     console.log('🚀 API Request:', {
       method: config.method?.toUpperCase(),
       url: `${config.baseURL}${config.url}`,
       data: config.data,
       dataStringified: JSON.stringify(config.data),
+      hasToken: !!token,
       headers: Object.fromEntries(
         Object.entries(config.headers || {}).filter(([_, v]) => v !== undefined)
       )
@@ -46,6 +53,18 @@ http.interceptors.response.use(
       data: error.response?.data,
       message: error.message
     })
+    
+    // Handle 401 Unauthorized - token expired or invalid
+    if (error.response?.status === 401) {
+      console.warn('🔒 Unauthorized - clearing auth token')
+      localStorage.removeItem('auth_token')
+      localStorage.removeItem('auth_user')
+      // Redirect to login page
+      if (!window.location.pathname.includes('/login')) {
+        window.location.href = '/login'
+      }
+    }
+    
     const message =
       error.response?.data?.detail ||
       error.response?.data?.message ||
