@@ -1,11 +1,11 @@
 import { Link } from 'react-router-dom'
-import { Bot, MessageSquare, Database, Zap } from 'lucide-react'
+import { Bot, MessageSquare, Database, Zap, FileText } from 'lucide-react'
 import { Button } from '@/components/ui/button'
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from '@/components/ui/card'
 
 export function HomePage() {
   return (
-    <div className="min-h-screen bg-gradient-to-b from-background to-muted">
+    <div className="bg-gradient-to-b from-background to-muted">
       <div className="container mx-auto px-4 py-16">
         {/* Hero Section */}
         <div className="text-center mb-16">
@@ -16,15 +16,18 @@ export function HomePage() {
           <p className="text-xl text-muted-foreground mb-8 max-w-2xl mx-auto">
             Build powerful AI agents using LangChain and Ollama. Manage conversations, threads, and knowledge bases with ease.
           </p>
-          <div className="flex gap-4 justify-center">
+          <div className="flex gap-4 justify-center flex-wrap">
             <Link to="/login">
               <Button size="lg">Get Started</Button>
             </Link>
             <Link to="/register">
               <Button size="lg" variant="outline">Sign Up</Button>
             </Link>
-            <Link to="/about">
-              <Button size="lg" variant="ghost">Learn More</Button>
+            <Link to="/docs">
+              <Button size="lg" variant="secondary">
+                <FileText className="mr-2 h-4 w-4" />
+                API Docs
+              </Button>
             </Link>
           </div>
         </div>

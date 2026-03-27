@@ -1,5 +1,6 @@
 import { createBrowserRouter } from 'react-router-dom'
 import { AppShell } from '@/components/layout/AppShell'
+import { PublicLayout } from '@/components/layout/PublicLayout'
 import { HomePage } from '@/pages/HomePage'
 import { LoginPage } from '@/pages/LoginPage'
 import { RegisterPage } from '@/pages/RegisterPage'
@@ -10,28 +11,23 @@ import { ChatPage } from '@/pages/ChatPage'
 import { KnowledgePage } from '@/pages/KnowledgePage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import AboutPage from '@/pages/AboutPage'
+import { DocsPage } from '@/pages/DocsPage'
 import { ErrorBoundary } from '@/components/common/ErrorBoundary'
 import { ProtectedRoute } from '@/components/common/ProtectedRoute'
 
 export const router = createBrowserRouter([
-  // Public routes
+  // Public routes with layout
   {
     path: '/',
-    element: <HomePage />,
+    element: <PublicLayout />,
     errorElement: <ErrorBoundary />,
-  },
-  {
-    path: '/login',
-    element: <LoginPage />,
-  },
-  {
-    path: '/register',
-    element: <RegisterPage />,
-  },
-  {
-    path: '/about',
-    element: <AboutPage />,
-    errorElement: <ErrorBoundary />,
+    children: [
+      { path: '/', element: <HomePage /> },
+      { path: '/login', element: <LoginPage /> },
+      { path: '/register', element: <RegisterPage /> },
+      { path: '/about', element: <AboutPage /> },
+      { path: '/docs', element: <DocsPage /> },
+    ],
   },
   // Protected routes
   {

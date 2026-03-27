@@ -24,7 +24,7 @@ export function ChatPage() {
     responseTime?: number;
   }>>([])
   const [input, setInput] = useState('')
-  const [useKnowledge, setUseKnowledge] = useState(false)
+  const [useKnowledge, setUseKnowledge] = useState(true)
   const chatMutation = useChatWithAgent()
   const createThreadMutation = useCreateAgentThread()
   const messagesEndRef = useRef<HTMLDivElement>(null)
@@ -261,7 +261,9 @@ export function ChatPage() {
                 }}
               >
                 <SelectTrigger id="agent-select">
-                  <SelectValue placeholder="Select an agent" />
+                  <SelectValue placeholder="Select an agent">
+                    {selectedAgent?.name || "Select an agent"}
+                  </SelectValue>
                 </SelectTrigger>
                 <SelectContent>
                   {agents?.map(agent => (
@@ -351,56 +353,22 @@ export function ChatPage() {
               </div>
             )}
 
-            {/* Knowledge Base Toggle - Visually Enhanced */}
-            <div 
-              className="pt-2 border-2 p-4 rounded-lg transition-colors"
-              style={{
-                backgroundColor: useKnowledge ? '#e8f5e9' : '#fff3e0',
-                borderColor: useKnowledge ? '#4caf50' : '#ff9800'
-              }}
-            >
-              <div className="flex items-center justify-between">
-                <div className="flex flex-col gap-1">
-                  <Label htmlFor="use-knowledge" className="text-sm font-bold">
-                    📚 Use Knowledge Base
-                  </Label>
-                  <span className="text-xs font-medium">
-                    {useKnowledge ? '✅ ENABLED - Searching files' : '❌ DISABLED - Using only training'}
-                  </span>
-                </div>
-                
-                {/* Native Checkbox as Fallback */}
-                <div className="flex flex-col items-center gap-2">
-                  <input
-                    type="checkbox"
-                    id="use-knowledge"
-                    checked={useKnowledge}
-                    onChange={(e) => {
-                      const checked = e.target.checked
-                      console.log('🔄 Knowledge switch toggled:', checked)
-                      setUseKnowledge(checked)
-                    }}
-                    style={{
-                      width: '24px',
-                      height: '24px',
-                      cursor: 'pointer',
-                      accentColor: '#4caf50'
-                    }}
-                  />
-                  <Button
-                    type="button"
-                    variant={useKnowledge ? "default" : "outline"}
-                    size="sm"
-                    onClick={() => {
-                      const newValue = !useKnowledge
-                      console.log('🔄 Knowledge button clicked:', newValue)
-                      setUseKnowledge(newValue)
-                    }}
-                  >
-                    {useKnowledge ? 'ON' : 'OFF'}
-                  </Button>
-                </div>
-              </div>
+            {/* Knowledge Base Toggle - Simple */}
+            <div className="flex items-center gap-2 py-2">
+              <input
+                type="checkbox"
+                id="use-knowledge"
+                checked={useKnowledge}
+                onChange={(e) => {
+                  const checked = e.target.checked
+                  console.log('🔄 Knowledge switch toggled:', checked)
+                  setUseKnowledge(checked)
+                }}
+                className="h-4 w-4 cursor-pointer"
+              />
+              <Label htmlFor="use-knowledge" className="text-sm cursor-pointer">
+                Use knowledge
+              </Label>
             </div>
 
             {selectedAgentId && selectedThreadId && (
@@ -436,7 +404,7 @@ export function ChatPage() {
             <CardTitle>Conversation</CardTitle>
           </CardHeader>
           <CardContent className="flex-1 flex flex-col min-h-0">
-            <div className="flex-1 overflow-y-auto mb-4 space-y-4">
+            <div className="flex-1 overflow-y-auto mb-4 space-y-4 max-h-[calc(100vh-300px)]">
               {!selectedAgentId ? (
                 <EmptyState 
                   icon={Bot} 

@@ -6,7 +6,6 @@ const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/agents', icon: Bot, label: 'Agents' },
   { to: '/chat', icon: MessageSquare, label: 'Chat' },
-  { to: '/knowledge', icon: BookOpen, label: 'Knowledge' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 

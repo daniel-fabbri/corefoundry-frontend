@@ -48,7 +48,7 @@ export default function AboutPage() {
   ];
 
   return (
-    <div className="container mx-auto px-4 py-8 max-w-6xl">
+    <div className="container mx-auto px-4 py-16 max-w-6xl">
       {/* Header */}
       <div className="text-center mb-12">
         <h1 className="text-4xl font-bold mb-4">About CoreFoundry</h1>
