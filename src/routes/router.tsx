@@ -9,6 +9,7 @@ import { AgentsPage } from '@/pages/AgentsPage'
 import { AgentDetailPage } from '@/pages/AgentDetailPage'
 import { ChatPage } from '@/pages/ChatPage'
 import { KnowledgePage } from '@/pages/KnowledgePage'
+import { CronjobsPage } from '@/pages/CronjobsPage'
 import { SettingsPage } from '@/pages/SettingsPage'
 import AboutPage from '@/pages/AboutPage'
 import { DocsPage } from '@/pages/DocsPage'
@@ -44,6 +45,7 @@ export const router = createBrowserRouter([
       { path: 'agents/:id', element: <AgentDetailPage /> },
       { path: 'chat', element: <ChatPage /> },
       { path: 'knowledge', element: <KnowledgePage /> },
+      { path: 'cronjobs', element: <CronjobsPage /> },
       { path: 'settings', element: <SettingsPage /> },
     ],
   },

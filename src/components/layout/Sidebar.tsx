@@ -1,11 +1,12 @@
 import { Link, useLocation } from 'react-router-dom'
-import { LayoutDashboard, Bot, MessageSquare, Settings, X } from 'lucide-react'
+import { LayoutDashboard, Bot, MessageSquare, Clock, Settings, X } from 'lucide-react'
 import { cn } from '@/lib/utils'
 
 const navItems = [
   { to: '/dashboard', icon: LayoutDashboard, label: 'Dashboard' },
   { to: '/agents', icon: Bot, label: 'Agents' },
   { to: '/chat', icon: MessageSquare, label: 'Chat' },
+  { to: '/cronjobs', icon: Clock, label: 'Cronjobs' },
   { to: '/settings', icon: Settings, label: 'Settings' },
 ]
 

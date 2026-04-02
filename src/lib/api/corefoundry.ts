@@ -18,6 +18,12 @@ import type {
   KnowledgeFile,
   KnowledgeFileUploadResponse,
 } from '../types/corefoundry'
+import type {
+  Cronjob,
+  CreateCronjobRequest,
+  UpdateCronjobRequest,
+  CronjobLog,
+} from '../types/cronjob'
 
 // Health
 export const getHealth = async (): Promise<HealthResponse> => {
@@ -220,4 +226,41 @@ export const getKnowledgeFiles = async (agentId: string): Promise<KnowledgeFile[
 
 export const deleteKnowledgeFile = async (agentId: string, filename: string): Promise<void> => {
   await http.delete(`/agents/${agentId}/knowledge/files/${filename}`)
+}
+
+// Cronjobs
+export const getCronjobs = async (): Promise<Cronjob[]> => {
+  const { data } = await http.get<Cronjob[]>('/cronjobs')
+  return data
+}
+
+export const createCronjob = async (payload: CreateCronjobRequest): Promise<Cronjob> => {
+  const { data } = await http.post<Cronjob>('/cronjobs', payload)
+  return data
+}
+
+export const getCronjob = async (cronjobId: number): Promise<Cronjob> => {
+  const { data } = await http.get<Cronjob>(`/cronjobs/${cronjobId}`)
+  return data
+}
+
+export const updateCronjob = async (cronjobId: number, payload: UpdateCronjobRequest): Promise<Cronjob> => {
+  const { data } = await http.put<Cronjob>(`/cronjobs/${cronjobId}`, payload)
+  return data
+}
+
+export const deleteCronjob = async (cronjobId: number): Promise<void> => {
+  await http.delete(`/cronjobs/${cronjobId}`)
+}
+
+export const toggleCronjob = async (cronjobId: number): Promise<Cronjob> => {
+  const { data } = await http.post<Cronjob>(`/cronjobs/${cronjobId}/toggle`)
+  return data
+}
+
+export const getCronjobLogs = async (cronjobId: number, limit = 50): Promise<CronjobLog[]> => {
+  const { data } = await http.get<CronjobLog[]>(`/cronjobs/${cronjobId}/logs`, {
+    params: { limit }
+  })
+  return data
 }
